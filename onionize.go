@@ -14,7 +14,10 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"archive/zip"
 
+	"golang.org/x/tools/godoc/vfs/zipfs"
+	"golang.org/x/tools/godoc/vfs/httpfs"
 	"github.com/nogoegst/bulb"
 	bulbUtils "github.com/nogoegst/bulb/utils"
 )
@@ -22,6 +25,8 @@ import (
 func main () {
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
+	var zipFlag = flag.Bool("zip", false,
+		"Serve zip file contents")
 	var control = flag.String("control-addr", "tcp://127.0.0.1:9051",
 		"Set Tor control address to be used")
 	var controlPasswd = flag.String("control-passwd", "",
@@ -30,7 +35,7 @@ func main () {
 	if (len(flag.Args()) != 1) {
 		log.Fatalf("You should specify exacly one webroot path")
 	}
-	webroot := flag.Args()[0]
+	pathToServe := flag.Args()[0]
 	debug := *debugFlag
 	// Parse control string
 	controlNet, controlAddr, err := bulbUtils.ParseControlPortString(*control)
@@ -55,8 +60,17 @@ func main () {
 	}
 
 	// At this point, c.Request() can be used to issue requests.
-
-	http.Handle("/", http.FileServer(http.Dir(webroot)))
+	var fs http.FileSystem
+	if *zipFlag {
+		rcZip, err := zip.OpenReader(pathToServe)
+		if err != nil {
+			log.Fatalf("Unable to open zip archive: %v", err)
+		}
+		fs = httpfs.New(zipfs.New(rcZip, "onionize"))
+	} else {
+		fs = http.Dir(pathToServe)
+	}
+	http.Handle("/", http.FileServer(fs))
         onionListener, err := c.Listener(80, nil)
         if err != nil {
                 log.Fatalf("Error occured while creating an onion service: %v", err)
@@ -93,6 +107,7 @@ func main () {
 		break
 	}
         fmt.Printf("http://%s/\n", onionID)
+
         err = http.Serve(onionListener, nil)
         if err != nil {
                 log.Fatalf("Cannot serve HTTP")
