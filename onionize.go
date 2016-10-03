@@ -17,6 +17,7 @@ import (
 	"os"
 	"archive/zip"
 
+	"golang.org/x/tools/godoc/vfs"
 	"golang.org/x/tools/godoc/vfs/zipfs"
 	"golang.org/x/tools/godoc/vfs/httpfs"
 	"github.com/nogoegst/bulb"
@@ -61,25 +62,25 @@ func main () {
 	}
 
 	// At this point, c.Request() can be used to issue requests.
-	var fs http.FileSystem
+	var fs vfs.FileSystem
 	if *zipFlag {
 		rcZip, err := zip.OpenReader(pathToServe)
 		if err != nil {
 			log.Fatalf("Unable to open zip archive: %v", err)
 		}
-		fs = httpfs.New(zipfs.New(rcZip, "onionize"))
+		fs = zipfs.New(rcZip, "onionize")
 	} else {
 		fileInfo, err := os.Stat(pathToServe)
 		if err != nil {
 			log.Fatalf("Unable to open path: %v", fileInfo)
 		}
 		if fileInfo.IsDir() {
-			fs = http.Dir(pathToServe)
+			fs = vfs.OS(pathToServe)
 		} else {
 			log.Fatalf("Unable to serve a single file [not implemented]")
 		}
 	}
-	http.Handle("/", http.FileServer(fs))
+	http.Handle("/", http.FileServer(httpfs.New(fs)))
         onionListener, err := c.Listener(80, nil)
         if err != nil {
                 log.Fatalf("Error occured while creating an onion service: %v", err)
