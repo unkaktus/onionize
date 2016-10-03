@@ -14,6 +14,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"os"
 	"archive/zip"
 
 	"golang.org/x/tools/godoc/vfs/zipfs"
@@ -68,7 +69,15 @@ func main () {
 		}
 		fs = httpfs.New(zipfs.New(rcZip, "onionize"))
 	} else {
-		fs = http.Dir(pathToServe)
+		fileInfo, err := os.Stat(pathToServe)
+		if err != nil {
+			log.Fatalf("Unable to open path: %v", fileInfo)
+		}
+		if fileInfo.IsDir() {
+			fs = http.Dir(pathToServe)
+		} else {
+			log.Fatalf("Unable to serve a single file [not implemented]")
+		}
 	}
 	http.Handle("/", http.FileServer(fs))
         onionListener, err := c.Listener(80, nil)
