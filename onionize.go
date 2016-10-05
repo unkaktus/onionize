@@ -79,7 +79,7 @@ func main () {
 	} else {
 		fileInfo, err := os.Stat(pathToServe)
 		if err != nil {
-			log.Fatalf("Unable to open path: %v", fileInfo)
+			log.Fatalf("Unable to open path: %v", err)
 		}
 		if fileInfo.IsDir() {
 			fs = vfs.OS(pathToServe)
