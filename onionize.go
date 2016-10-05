@@ -15,11 +15,15 @@ import (
 	"net/http"
 	"strings"
 	"os"
+	"path/filepath"
 	"archive/zip"
+	"crypto/rand"
 
 	"golang.org/x/tools/godoc/vfs"
+	"github.com/nogoegst/pickfs"
 	"golang.org/x/tools/godoc/vfs/zipfs"
 	"golang.org/x/tools/godoc/vfs/httpfs"
+	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/bulb"
 	bulbUtils "github.com/nogoegst/bulb/utils"
 )
@@ -62,7 +66,10 @@ func main () {
 	}
 
 	// At this point, c.Request() can be used to issue requests.
+
 	var fs vfs.FileSystem
+	var url string
+
 	if *zipFlag {
 		rcZip, err := zip.OpenReader(pathToServe)
 		if err != nil {
@@ -77,7 +84,18 @@ func main () {
 		if fileInfo.IsDir() {
 			fs = vfs.OS(pathToServe)
 		} else {
-			log.Fatalf("Unable to serve a single file [not implemented]")
+			abspath, err := filepath.Abs(pathToServe)
+			if err != nil {
+				log.Fatalf("Unable to get absolute path to file")
+			}
+			dir, file := filepath.Split(abspath)
+			slugBin := make([]byte, 5)
+			_, err = rand.Read(slugBin)
+			slug := onionutil.Base32Encode(slugBin)[:8]
+			m := make(map[string]string)
+			url = slug+"/"+file
+			m[url]= file
+			fs = pickfs.New(vfs.OS(dir), m)
 		}
 	}
 	http.Handle("/", http.FileServer(httpfs.New(fs)))
@@ -116,7 +134,7 @@ func main () {
 		}
 		break
 	}
-        fmt.Printf("http://%s/\n", onionID)
+        fmt.Printf("http://%s/%s\n", onionID, url)
 
         err = http.Serve(onionListener, nil)
         if err != nil {
