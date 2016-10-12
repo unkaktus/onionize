@@ -19,6 +19,7 @@ import (
 	"archive/zip"
 	"crypto/rand"
 
+	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/tools/godoc/vfs"
 	"github.com/nogoegst/pickfs"
 	"golang.org/x/tools/godoc/vfs/zipfs"
@@ -33,6 +34,8 @@ func main () {
 		"Show what's happening")
 	var zipFlag = flag.Bool("zip", false,
 		"Serve zip file contents")
+	var passphraseFlag = flag.Bool("p", false,
+		"Ask for passphrase to generate onion key")
 	var control = flag.String("control-addr", "tcp://127.0.0.1:9051",
 		"Set Tor control address to be used")
 	var controlPasswd = flag.String("control-passwd", "",
@@ -99,7 +102,25 @@ func main () {
 		}
 	}
 	http.Handle("/", http.FileServer(httpfs.New(fs)))
-        onionListener, err := c.Listener(80, nil)
+
+	var onionListener net.Listener
+
+	if *passphraseFlag {
+		fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
+		onionPassphrase, err := terminal.ReadPassword(0)
+		if err != nil {
+			log.Fatalf("Unable to read onion passphrase: %v", err)
+		}
+		fmt.Printf("\n")
+
+		privOnionKey, err := onionutil.GenerateOnionKey(onionutil.KeystreamReader([]byte(onionPassphrase), []byte("onionize-keygen")))
+		if err != nil {
+			log.Fatalf("Unable to generate onion key: %v", err)
+		}
+		onionListener, err = c.Listener(80, privOnionKey)
+	} else {
+		onionListener, err = c.Listener(80, nil)
+	}
         if err != nil {
                 log.Fatalf("Error occured while creating an onion service: %v", err)
         }
