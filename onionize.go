@@ -13,6 +13,7 @@ import (
 	"flag"
 	"net"
 	"net/http"
+	neturl "net/url"
 	"strings"
 	"os"
 	"path/filepath"
@@ -99,6 +100,8 @@ func main () {
 			url = slug+"/"+file
 			m[url]= file
 			fs = pickfs.New(vfs.OS(dir), m)
+			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
+			url = slug+"/"+escapedFilename
 		}
 	}
 	http.Handle("/", http.FileServer(httpfs.New(fs)))
