@@ -27,7 +27,6 @@ import (
 	"golang.org/x/tools/godoc/vfs/httpfs"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/bulb"
-	bulbUtils "github.com/nogoegst/bulb/utils"
 )
 
 func main () {
@@ -37,7 +36,7 @@ func main () {
 		"Serve zip file contents")
 	var passphraseFlag = flag.Bool("p", false,
 		"Ask for passphrase to generate onion key")
-	var control = flag.String("control-addr", "tcp://127.0.0.1:9051",
+	var control = flag.String("control-addr", "default://",
 		"Set Tor control address to be used")
 	var controlPasswd = flag.String("control-passwd", "",
 		"Set Tor control auth password")
@@ -47,13 +46,8 @@ func main () {
 	}
 	pathToServe := flag.Args()[0]
 	debug := *debugFlag
-	// Parse control string
-	controlNet, controlAddr, err := bulbUtils.ParseControlPortString(*control)
-	if err != nil {
-	log.Fatalf("Failed to parse Tor control address string: %v", err)
-	}
 	// Connect to a running tor instance.
-	c, err := bulb.Dial(controlNet, controlAddr)
+	c, err := bulb.DialURL(*control)
 	if err != nil {
 		log.Fatalf("Failed to connect to control socket: %v", err)
 	}
