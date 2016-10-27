@@ -124,35 +124,26 @@ func main () {
                 log.Fatalf("Error occured while creating an onion service: %v", err)
         }
         defer onionListener.Close()
-	onionID, _, err := net.SplitHostPort(onionListener.Addr().String())
+	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
         if err != nil {
 		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
         }
+	onionID := strings.TrimSuffix(onionHost, ".onion")
 	// Wait for service descriptor upload
 	c.StartAsyncReader()
 	if _, err := c.Request("SETEVENTS HS_DESC"); err != nil {
 		log.Fatalf("SETEVENTS HS_DESC has failed: %v", err)
 	}
+	eventPrefix := fmt.Sprintf("HS_DESC UPLOADED %s", onionID)
 
 	for {
 		ev, err := c.NextEvent()
 		if err != nil {
-			log.Printf("NextEvent has failed: %v", err)
-			continue
+			log.Fatalf("NextEvent has failed: %v", err)
 		}
-		splittedReply := strings.Split(ev.Reply, " ")
-		if (len(splittedReply) < 3) {
-			continue
+		if strings.HasPrefix(ev.Reply, eventPrefix) {
+			break
 		}
-		hsDescAction := splittedReply[1]
-		if (hsDescAction != "UPLOADED") {
-			continue
-		}
-		onionID := splittedReply[2]
-		if (onionID != onionListener.Addr().String()[:len(onionID)]) {
-			continue
-		}
-		break
 	}
 	// Display the link to the service
         fmt.Printf("http://%s/%s\n", onionID, url)
@@ -161,6 +152,5 @@ func main () {
         if err != nil {
                 log.Fatalf("Cannot serve HTTP")
         }
-
 }
 
