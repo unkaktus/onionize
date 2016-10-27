@@ -46,29 +46,26 @@ func main () {
 	}
 	pathToServe := flag.Args()[0]
 	debug := *debugFlag
-	// Connect to a running tor instance.
+	// Connect to a running tor instance
 	c, err := bulb.DialURL(*control)
 	if err != nil {
 		log.Fatalf("Failed to connect to control socket: %v", err)
 	}
 	defer c.Close()
 
-	// See what's really going on under the hood.
-	// Do not enable in production.
+	// See what's really going on under the hood
 	c.Debug(debug)
 
-	// Authenticate with the control port.  The password argument
-	// here can be "" if no password is set (CookieAuth, no auth).
+	// Authenticate with the control port
 	if err := c.Authenticate(*controlPasswd); err != nil {
 		log.Fatalf("Authentication failed: %v", err)
 	}
-
-	// At this point, c.Request() can be used to issue requests.
 
 	var fs vfs.FileSystem
 	var url string
 
 	if *zipFlag {
+		// Serve contents of zip archive
 		rcZip, err := zip.OpenReader(pathToServe)
 		if err != nil {
 			log.Fatalf("Unable to open zip archive: %v", err)
@@ -80,8 +77,10 @@ func main () {
 			log.Fatalf("Unable to open path: %v", err)
 		}
 		if fileInfo.IsDir() {
+			// Serve a plain directory
 			fs = vfs.OS(pathToServe)
 		} else {
+			// Serve just one file in OnionShare-like manner
 			abspath, err := filepath.Abs(pathToServe)
 			if err != nil {
 				log.Fatalf("Unable to get absolute path to file")
@@ -94,12 +93,15 @@ func main () {
 			url = slug+"/"+file
 			m[url]= file
 			fs = pickfs.New(vfs.OS(dir), m)
+			// Escape URL to be safe and copypasteble
 			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
 			url = slug+"/"+escapedFilename
 		}
 	}
+	// Serve our virtual filesystem
 	http.Handle("/", http.FileServer(httpfs.New(fs)))
 
+	// Derive onion service keymaterial from passphrase or generate a new one
 	var onionListener net.Listener
 
 	if *passphraseFlag {
@@ -123,11 +125,11 @@ func main () {
         }
         defer onionListener.Close()
 	onionID, _, err := net.SplitHostPort(onionListener.Addr().String())
-
-	c.StartAsyncReader()
         if err != nil {
 		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
         }
+	// Wait for service descriptor upload
+	c.StartAsyncReader()
 	if _, err := c.Request("SETEVENTS HS_DESC"); err != nil {
 		log.Fatalf("SETEVENTS HS_DESC has failed: %v", err)
 	}
@@ -152,8 +154,9 @@ func main () {
 		}
 		break
 	}
+	// Display the link to the service
         fmt.Printf("http://%s/%s\n", onionID, url)
-
+	// Run webservice
         err = http.Serve(onionListener, nil)
         if err != nil {
                 log.Fatalf("Cannot serve HTTP")
