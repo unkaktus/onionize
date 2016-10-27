@@ -1,4 +1,4 @@
-// onionize.go - onionize directories.
+// onionize.go - onionize directories, files and zips.
 //
 // To the extent possible under law, Ivan Markin waived all copyright
 // and related or neighboring rights to this module of onionize, using the creative
@@ -42,7 +42,7 @@ func main() {
 		"Set Tor control auth password")
 	flag.Parse()
 	if len(flag.Args()) != 1 {
-		log.Fatalf("You should specify exacly one webroot path")
+		log.Fatalf("You should specify exactly one path")
 	}
 	pathToServe := flag.Args()[0]
 	debug := *debugFlag
