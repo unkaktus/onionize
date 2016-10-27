@@ -146,7 +146,7 @@ func main() {
 		}
 	}
 	// Display the link to the service
-	fmt.Printf("http://%s/%s\n", onionID, url)
+	fmt.Printf("http://%s/%s\n", onionHost, url)
 	// Run webservice
 	err = http.Serve(onionListener, nil)
 	if err != nil {
