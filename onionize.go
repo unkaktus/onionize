@@ -8,28 +8,28 @@
 package main
 
 import (
-	"log"
-	"fmt"
+	"archive/zip"
+	"crypto/rand"
 	"flag"
+	"fmt"
+	"log"
 	"net"
 	"net/http"
 	neturl "net/url"
-	"strings"
 	"os"
 	"path/filepath"
-	"archive/zip"
-	"crypto/rand"
+	"strings"
 
+	"github.com/nogoegst/bulb"
+	"github.com/nogoegst/onionutil"
+	"github.com/nogoegst/pickfs"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/tools/godoc/vfs"
-	"github.com/nogoegst/pickfs"
-	"golang.org/x/tools/godoc/vfs/zipfs"
 	"golang.org/x/tools/godoc/vfs/httpfs"
-	"github.com/nogoegst/onionutil"
-	"github.com/nogoegst/bulb"
+	"golang.org/x/tools/godoc/vfs/zipfs"
 )
 
-func main () {
+func main() {
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
 	var zipFlag = flag.Bool("zip", false,
@@ -41,7 +41,7 @@ func main () {
 	var controlPasswd = flag.String("control-passwd", "",
 		"Set Tor control auth password")
 	flag.Parse()
-	if (len(flag.Args()) != 1) {
+	if len(flag.Args()) != 1 {
 		log.Fatalf("You should specify exacly one webroot path")
 	}
 	pathToServe := flag.Args()[0]
@@ -90,12 +90,12 @@ func main () {
 			_, err = rand.Read(slugBin)
 			slug := onionutil.Base32Encode(slugBin)[:8]
 			m := make(map[string]string)
-			url = slug+"/"+file
-			m[url]= file
+			url = slug + "/" + file
+			m[url] = file
 			fs = pickfs.New(vfs.OS(dir), m)
 			// Escape URL to be safe and copypasteble
 			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
-			url = slug+"/"+escapedFilename
+			url = slug + "/" + escapedFilename
 		}
 	}
 	// Serve our virtual filesystem
@@ -120,14 +120,14 @@ func main () {
 	} else {
 		onionListener, err = c.Listener(80, nil)
 	}
-        if err != nil {
-                log.Fatalf("Error occured while creating an onion service: %v", err)
-        }
-        defer onionListener.Close()
+	if err != nil {
+		log.Fatalf("Error occured while creating an onion service: %v", err)
+	}
+	defer onionListener.Close()
 	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
-        if err != nil {
+	if err != nil {
 		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
-        }
+	}
 	onionID := strings.TrimSuffix(onionHost, ".onion")
 	// Wait for service descriptor upload
 	c.StartAsyncReader()
@@ -146,11 +146,10 @@ func main () {
 		}
 	}
 	// Display the link to the service
-        fmt.Printf("http://%s/%s\n", onionID, url)
+	fmt.Printf("http://%s/%s\n", onionID, url)
 	// Run webservice
-        err = http.Serve(onionListener, nil)
-        if err != nil {
-                log.Fatalf("Cannot serve HTTP")
-        }
+	err = http.Serve(onionListener, nil)
+	if err != nil {
+		log.Fatalf("Cannot serve HTTP")
+	}
 }
-
