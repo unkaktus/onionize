@@ -1,34 +1,25 @@
 onionize
 ===========
-Make static onion site up and running from any directory.
-Or share a file via one-shot onion site.
+Make an onion site up and running from any a
+directory/file/zip archive.
+
 Onion sites are end-to-end encrypted, metadata-free and forward-secure.
 Much love to onion services.
 
 Install
 -------
 ```
-$ torsocks go get github.com/nogoegst/onionize
+$ go get github.com/nogoegst/onionize
 ```
 
 Usage
 -----
+To onionize a [directory|file|zip archive]:
+
 ```
-$ onionize /path/to/my/tiny/webroot
+$ onionize [||-z] /path/to/my/[directory|file|archive.zip]
 ```
 
-Grab onion address from `stdout` and errors/info from `stderr`.
+Grab the onion link from `stdout` and errors/info from `stderr`.
  
 That's it.
-
-Also you can `onionize` contents of a `zip` file:
-
-```
-$ onionize /path/to/my/tiny/webroot.zip
-```
-
-You also can share a file as `oignonshare` does:
-
-```
-$ onionize /path/to/my/secret.file
-```
