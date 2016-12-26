@@ -17,7 +17,7 @@ Usage
 To onionize a [directory|file|zip archive]:
 
 ```
-$ onionize [||-z] /path/to/my/[directory|file|archive.zip]
+$ onionize [||-zip] /path/to/my/[directory|file|archive.zip]
 ```
 
 Grab the onion link from `stdout` and errors/info from `stderr`.
