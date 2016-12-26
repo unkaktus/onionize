@@ -23,7 +23,7 @@ import (
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/pickfs"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/nogoegst/terminal"
 	"golang.org/x/tools/godoc/vfs"
 	"golang.org/x/tools/godoc/vfs/httpfs"
 	"golang.org/x/tools/godoc/vfs/zipfs"
