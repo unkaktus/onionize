@@ -95,6 +95,7 @@ func beforeWidget() *gtk.Widget {
 			}
 		case "file":
 			slugChkBox.SetActive(true)
+			slugChkBox.SetSensitive(true)
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
