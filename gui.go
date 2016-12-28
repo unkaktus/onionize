@@ -73,6 +73,7 @@ func beforeWidget() *gtk.Widget {
 	if err != nil {
 		log.Fatal(err)
 	}
+	slugChkBox.SetActive(true)
 	grid.Attach(slugChkBox, 2, 0, 1, 1)
 
 	combo, err := gtk.ComboBoxTextNew()
@@ -90,22 +91,16 @@ func beforeWidget() *gtk.Widget {
 		var err error
 		switch pathtype {
 		case "directory":
-			slugChkBox.SetActive(false)
-			slugChkBox.SetSensitive(false)
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
 			if err != nil {
 				log.Fatal(err)
 			}
 		case "file":
-			slugChkBox.SetActive(true)
-			slugChkBox.SetSensitive(true)
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
 			}
 		case "zip":
-			slugChkBox.SetActive(false)
-			slugChkBox.SetSensitive(false)
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)

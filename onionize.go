@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"crypto/subtle"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
@@ -84,6 +85,17 @@ func main() {
 
 	var fs vfs.FileSystem
 	var url string
+	var slug string
+	if p.Slug {
+		slugBin := make([]byte, 5)
+		_, err := rand.Read(slugBin)
+		if err != nil {
+			log.Fatalf("Unable to generate slug: %v", err)
+		}
+		slug = onionutil.Base32Encode(slugBin)[:8]
+		url += slug + "/"
+	}
+	slugPrefix := "/"+slug
 
 	if p.Zip {
 		// Serve contents of zip archive
@@ -107,24 +119,27 @@ func main() {
 				log.Fatalf("Unable to get absolute path to file")
 			}
 			dir, file := filepath.Split(abspath)
-			var slug string
-			if p.Slug {
-				slugBin := make([]byte, 5)
-				_, err = rand.Read(slugBin)
-				slug = onionutil.Base32Encode(slugBin)[:8]
-				slug += "/"
-			}
 			m := make(map[string]string)
-			url = slug + file
-			m[url] = file
+			m[file] = file
 			fs = pickfs.New(vfs.OS(dir), m)
 			// Escape URL to be safe and copypasteble
 			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
-			url = slug + escapedFilename
+			url += escapedFilename
 		}
 	}
 	// Serve our virtual filesystem
-	http.Handle("/", http.FileServer(httpfs.New(fs)))
+	fileserver := http.FileServer(httpfs.New(fs))
+	http.HandleFunc(slugPrefix+"/", func(w http.ResponseWriter, req *http.Request) {
+		reqURL := req.URL.String()
+		if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
+			http.NotFound(w, req)
+			return
+		}
+		reqURL = strings.TrimLeft(reqURL, slugPrefix)
+		req.URL, _ = neturl.Parse(reqURL)
+		log.Printf("url: %s", req.URL)
+		fileserver.ServeHTTP(w, req)
+	})
 
 	// Connect to a running tor instance
 	c, err := bulb.DialURL(*control)
