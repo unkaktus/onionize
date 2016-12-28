@@ -137,7 +137,6 @@ func main() {
 		}
 		reqURL = strings.TrimLeft(reqURL, slugPrefix)
 		req.URL, _ = neturl.Parse(reqURL)
-		log.Printf("url: %s", req.URL)
 		fileserver.ServeHTTP(w, req)
 	})
 
