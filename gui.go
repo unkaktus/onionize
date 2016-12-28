@@ -65,6 +65,8 @@ func beforeWidget() *gtk.Widget {
 		log.Fatal("Unable to create grid:", err)
 	}
 	grid.SetOrientation(gtk.ORIENTATION_VERTICAL)
+	grid.SetRowSpacing(12)
+	grid.SetColumnSpacing(12)
 
 	slugChkBox, err := gtk.CheckButtonNewWithLabel("slug")
 	if err != nil {
