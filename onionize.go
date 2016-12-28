@@ -43,8 +43,6 @@ var paramsCh = make(chan Parameters)
 var urlCh = make(chan string)
 
 func main() {
-	var guiFlag = flag.Bool("gui", false,
-		"Run in GTK3 mode")
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
 	var zipFlag = flag.Bool("zip", false,
@@ -57,7 +55,7 @@ func main() {
 		"Set Tor control auth password")
 	flag.Parse()
 
-	if *guiFlag {
+	if len(flag.Args()) == 0 {
 		go guiMain()
 	} else {
 		go func() {

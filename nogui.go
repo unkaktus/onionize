@@ -11,5 +11,5 @@ package main
 import "log"
 
 func guiMain() {
-	log.Fatal("onionize is built without GUI support")
+	log.Fatal("This version of onionize is built without GUI support")
 }
