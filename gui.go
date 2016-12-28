@@ -142,6 +142,7 @@ func beforeWidget() *gtk.Widget {
 		doBtn.SetSensitive(false)
 		doBtn.SetLabel("onionizing...")
 		combo.SetSensitive(false)
+		slugChkBox.SetSensitive(false)
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
