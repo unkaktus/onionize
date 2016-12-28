@@ -42,11 +42,13 @@ func guiMain() {
 			log.Fatal("Unable to create entry:", err)
 		}
 		urlEntry.SetHExpand(true)
+		grid.RemoveRow(1)
 		grid.RemoveRow(0)
 		grid.InsertRow(0)
 		grid.Attach(urlEntry, 0, 0, 1, 1)
 		urlEntry.SetText(u)
 		grid.ShowAll()
+		win.Resize(1,1)
 	}()
 	win.ShowAll()
 
@@ -70,6 +72,11 @@ func beforeWidget() *gtk.Widget {
 	fchooserBtn.SetHExpand(false)
 	grid.Attach(fchooserBtn, 0, 0, 1, 1)
 
+	zipChkBox, err := gtk.CheckButtonNewWithLabel("zip")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grid.Attach(zipChkBox, 1, 0, 1, 1)
 	doBtn, err := gtk.ButtonNewWithLabel("onionize")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
@@ -86,11 +93,12 @@ func beforeWidget() *gtk.Widget {
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
+			Zip:  zipChkBox.GetActive(),
 		}
 		paramsCh <- p
 
 	})
-	grid.Attach(doBtn, 1, 0, 1, 1)
+	grid.Attach(doBtn, 0, 1, 2, 1)
 
 
 	return &grid.Container.Widget
