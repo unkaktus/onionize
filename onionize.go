@@ -29,7 +29,20 @@ import (
 	"golang.org/x/tools/godoc/vfs/zipfs"
 )
 
+type Parameters struct {
+	Path	string
+	Zip	bool
+	ControlPath	string
+	ControlPassword	string
+	Passphrase	string
+}
+
+var paramsCh = make(chan Parameters)
+var urlCh = make(chan string)
+
 func main() {
+	var guiFlag = flag.Bool("gui", false,
+		"Run in GTK3 mode")
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
 	var zipFlag = flag.Bool("zip", false,
@@ -41,11 +54,34 @@ func main() {
 	var controlPasswd = flag.String("control-passwd", "",
 		"Set Tor control auth password")
 	flag.Parse()
-	if len(flag.Args()) != 1 {
-		log.Fatalf("You should specify exactly one path")
+
+	if *guiFlag {
+		go guiMain()
+	} else {
+		go func() {
+			p := Parameters{}
+			if len(flag.Args()) != 1 {
+				log.Fatalf("You should specify exactly one path")
+			}
+			p.Path = flag.Args()[0]
+			p.Zip = *zipFlag
+			if *passphraseFlag {
+				fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
+				onionPassphrase, err := terminal.ReadPassword(0)
+				if err != nil {
+					log.Fatalf("Unable to read onion passphrase: %v", err)
+				}
+				fmt.Printf("\n")
+				p.Passphrase = string(onionPassphrase)
+			}
+			log.Printf("%v", p)
+			paramsCh <- p
+			fmt.Println(<-urlCh)
+		}()
 	}
-	pathToServe := flag.Args()[0]
 	debug := *debugFlag
+	p := <-paramsCh
+	log.Printf("%v", p)
 	// Connect to a running tor instance
 	c, err := bulb.DialURL(*control)
 	if err != nil {
@@ -64,24 +100,24 @@ func main() {
 	var fs vfs.FileSystem
 	var url string
 
-	if *zipFlag {
+	if p.Zip {
 		// Serve contents of zip archive
-		rcZip, err := zip.OpenReader(pathToServe)
+		rcZip, err := zip.OpenReader(p.Path)
 		if err != nil {
 			log.Fatalf("Unable to open zip archive: %v", err)
 		}
 		fs = zipfs.New(rcZip, "onionize")
 	} else {
-		fileInfo, err := os.Stat(pathToServe)
+		fileInfo, err := os.Stat(p.Path)
 		if err != nil {
 			log.Fatalf("Unable to open path: %v", err)
 		}
 		if fileInfo.IsDir() {
 			// Serve a plain directory
-			fs = vfs.OS(pathToServe)
+			fs = vfs.OS(p.Path)
 		} else {
 			// Serve just one file in OnionShare-like manner
-			abspath, err := filepath.Abs(pathToServe)
+			abspath, err := filepath.Abs(p.Path)
 			if err != nil {
 				log.Fatalf("Unable to get absolute path to file")
 			}
@@ -104,15 +140,8 @@ func main() {
 	// Derive onion service keymaterial from passphrase or generate a new one
 	var onionListener net.Listener
 
-	if *passphraseFlag {
-		fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
-		onionPassphrase, err := terminal.ReadPassword(0)
-		if err != nil {
-			log.Fatalf("Unable to read onion passphrase: %v", err)
-		}
-		fmt.Printf("\n")
-
-		privOnionKey, err := onionutil.GenerateOnionKey(onionutil.KeystreamReader([]byte(onionPassphrase), []byte("onionize-keygen")))
+	if p.Passphrase != "" {
+		privOnionKey, err := onionutil.GenerateOnionKey(onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen")))
 		if err != nil {
 			log.Fatalf("Unable to generate onion key: %v", err)
 		}
@@ -146,7 +175,7 @@ func main() {
 		}
 	}
 	// Display the link to the service
-	fmt.Printf("http://%s/%s\n", onionHost, url)
+	urlCh <- fmt.Sprintf("http://%s/%s", onionHost, url)
 	// Run webservice
 	err = http.Serve(onionListener, nil)
 	if err != nil {
