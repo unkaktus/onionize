@@ -4,6 +4,7 @@
 // and related or neighboring rights to this module of onionize, using the creative
 // commons "cc0" public domain dedication. See LICENSE or
 // <http://creativecommons.org/publicdomain/zero/1.0/> for full details.
+// +build gui
 
 package main
 
@@ -43,12 +44,12 @@ func guiMain() {
 		if err != nil {
 			log.Fatal("Unable to create entry:", err)
 		}
+		urlEntry.SetText(u)
 		urlEntry.SetHExpand(true)
 		grid.RemoveRow(1)
 		grid.RemoveRow(0)
 		grid.InsertRow(0)
 		grid.Attach(urlEntry, 0, 0, 1, 1)
-		urlEntry.SetText(u)
 		grid.ShowAll()
 		win.Resize(1,1)
 	}()
