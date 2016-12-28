@@ -150,7 +150,7 @@ func beforeWidget() *gtk.Widget {
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
-			Zip:  false,
+			Zip:  "zip" == combo.GetActiveText(),
 			Slug: slugChkBox.GetActive(),
 		}
 		paramsCh <- p
