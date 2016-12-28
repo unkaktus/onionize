@@ -75,14 +75,12 @@ func main() {
 				fmt.Printf("\n")
 				p.Passphrase = string(onionPassphrase)
 			}
-			log.Printf("%v", p)
 			paramsCh <- p
 			fmt.Println(<-urlCh)
 		}()
 	}
 	debug := *debugFlag
 	p := <-paramsCh
-	log.Printf("%v", p)
 	// Connect to a running tor instance
 	c, err := bulb.DialURL(*control)
 	if err != nil {
