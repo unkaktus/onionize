@@ -81,20 +81,6 @@ func main() {
 	}
 	debug := *debugFlag
 	p := <-paramsCh
-	// Connect to a running tor instance
-	c, err := bulb.DialURL(*control)
-	if err != nil {
-		log.Fatalf("Failed to connect to control socket: %v", err)
-	}
-	defer c.Close()
-
-	// See what's really going on under the hood
-	c.Debug(debug)
-
-	// Authenticate with the control port
-	if err := c.Authenticate(*controlPasswd); err != nil {
-		log.Fatalf("Authentication failed: %v", err)
-	}
 
 	var fs vfs.FileSystem
 	var url string
@@ -140,6 +126,20 @@ func main() {
 	// Serve our virtual filesystem
 	http.Handle("/", http.FileServer(httpfs.New(fs)))
 
+	// Connect to a running tor instance
+	c, err := bulb.DialURL(*control)
+	if err != nil {
+		log.Fatalf("Failed to connect to control socket: %v", err)
+	}
+	defer c.Close()
+
+	// See what's really going on under the hood
+	c.Debug(debug)
+
+	// Authenticate with the control port
+	if err := c.Authenticate(*controlPasswd); err != nil {
+		log.Fatalf("Authentication failed: %v", err)
+	}
 	// Derive onion service keymaterial from passphrase or generate a new one
 	var onionListener net.Listener
 
