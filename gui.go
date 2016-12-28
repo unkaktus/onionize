@@ -145,6 +145,7 @@ func beforeWidget() *gtk.Widget {
 		fchooserBtn.SetSensitive(false)
 		doBtn.SetSensitive(false)
 		doBtn.SetLabel("onionizing...")
+		combo.SetSensitive(false)
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
