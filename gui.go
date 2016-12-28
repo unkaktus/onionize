@@ -9,15 +9,15 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/gotk3/gotk3/glib"
 )
 
 
 const applicationTitle = "onionize"
 
-var urlEntry *gtk.Entry
+var grid *gtk.Grid
 
 func guiMain() {
 	gtk.Init(nil)
@@ -30,23 +30,33 @@ func guiMain() {
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
-
-	win.Add(windowWidget())
+	win.SetDefaultSize(1, 1)
+	win.SetResizable(false)
+	w := beforeWidget()
+	win.Add(w)
 
 	go func(){
 		u := <-urlCh
-		_, err := glib.IdleAdd(urlEntry.SetText, u)
+		urlEntry, err := gtk.EntryNew()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Unable to create entry:", err)
 		}
+		urlEntry.SetHExpand(true)
+		grid.RemoveRow(0)
+		grid.InsertRow(0)
+		grid.Attach(urlEntry, 0, 0, 1, 1)
+		urlEntry.SetText(u)
+		grid.ShowAll()
 	}()
 	win.ShowAll()
 
 	gtk.Main()
+	os.Exit(0)
 }
 
-func windowWidget() *gtk.Widget {
-	grid, err := gtk.GridNew()
+func beforeWidget() *gtk.Widget {
+	var err error
+	grid, err = gtk.GridNew()
 	if err != nil {
 		log.Fatal("Unable to create grid:", err)
 	}
@@ -57,20 +67,22 @@ func windowWidget() *gtk.Widget {
 		log.Fatal("Unable to create file button:", err)
 	}
 
-	fchooserBtn.SetHExpand(true)
+	fchooserBtn.SetHExpand(false)
 	grid.Attach(fchooserBtn, 0, 0, 1, 1)
 
-	insertBtn, err := gtk.ButtonNewWithLabel("onionize")
+	doBtn, err := gtk.ButtonNewWithLabel("onionize")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
 	}
 
-	insertBtn.Connect("clicked", func() {
+	doBtn.Connect("clicked", func() {
 		path := fchooserBtn.GetFilename()
 		if path == "" {
 			return
 		}
-		insertBtn.SetSensitive(false)
+		fchooserBtn.SetSensitive(false)
+		doBtn.SetSensitive(false)
+		doBtn.SetLabel("onionizing...")
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
@@ -78,15 +90,8 @@ func windowWidget() *gtk.Widget {
 		paramsCh <- p
 
 	})
-	grid.Attach(insertBtn, 1, 0, 1, 1)
+	grid.Attach(doBtn, 1, 0, 1, 1)
 
-	urlEntry, err = gtk.EntryNew()
-	if err != nil {
-		log.Fatal("Unable to create entry:", err)
-	}
-	urlEntry.SetHExpand(true)
-
-	grid.Attach(urlEntry, 0, 1, 2, 1)
 
 	return &grid.Container.Widget
 }
