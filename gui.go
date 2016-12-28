@@ -17,12 +17,14 @@ import (
 
 const applicationTitle = "onionize"
 
+var win *gtk.Window
 var grid *gtk.Grid
 
 func guiMain() {
 	gtk.Init(nil)
 
-	win, err := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
+	var err error
+	win, err = gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	if err != nil {
 		log.Fatal("Unable to create window:", err)
 	}
@@ -64,19 +66,68 @@ func beforeWidget() *gtk.Widget {
 	}
 	grid.SetOrientation(gtk.ORIENTATION_VERTICAL)
 
-	fchooserBtn, err := gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
-	if err != nil {
-		log.Fatal("Unable to create file button:", err)
-	}
-
-	fchooserBtn.SetHExpand(false)
-	grid.Attach(fchooserBtn, 0, 0, 1, 1)
-
-	zipChkBox, err := gtk.CheckButtonNewWithLabel("zip")
+	slugChkBox, err := gtk.CheckButtonNewWithLabel("slug")
 	if err != nil {
 		log.Fatal(err)
 	}
-	grid.Attach(zipChkBox, 1, 0, 1, 1)
+	slugChkBox.SetSensitive(false)
+	grid.Attach(slugChkBox, 2, 0, 1, 1)
+
+	combo, err := gtk.ComboBoxTextNew()
+	if err != nil {
+		log.Fatal(err)
+	}
+	combo.AppendText("file")
+	combo.AppendText("directory")
+	combo.AppendText("zip")
+	combo.SetActive(0)
+	grid.Attach(combo, 0, 0, 1, 1)
+	var fchooserBtn *gtk.FileChooserButton
+
+	updateFileChooser := func(pathtype string) {
+		var err error
+		switch pathtype {
+		case "directory":
+			slugChkBox.SetActive(false)
+			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "file":
+			slugChkBox.SetActive(true)
+			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "zip":
+			slugChkBox.SetActive(false)
+			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ffilter, err := gtk.FileFilterNew()
+			if err != nil {
+				log.Fatal(err)
+			}
+			ffilter.AddPattern("*.zip")
+			fchooserBtn.AddFilter(ffilter)
+		}
+		fchooserBtn.SetHExpand(false)
+		w, err := grid.GetChildAt(1, 0)
+		if err == nil {
+			w.Destroy()
+		}
+		grid.Attach(fchooserBtn, 1, 0, 1, 1)
+		grid.ShowAll()
+		win.Resize(1, 1)
+	}
+	combo.Connect("changed", func() {
+		activeText := combo.GetActiveText()
+		updateFileChooser(activeText)
+	})
+	updateFileChooser("file")
+
+
 	doBtn, err := gtk.ButtonNewWithLabel("onionize")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
@@ -93,12 +144,13 @@ func beforeWidget() *gtk.Widget {
 		grid.ShowAll()
 		p := Parameters{
 			Path: path,
-			Zip:  zipChkBox.GetActive(),
+			Zip:  false,
+			//Slug: slug,
 		}
 		paramsCh <- p
 
 	})
-	grid.Attach(doBtn, 0, 1, 2, 1)
+	grid.Attach(doBtn, 0, 1, 3, 1)
 
 
 	return &grid.Container.Widget
