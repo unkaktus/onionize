@@ -46,10 +46,12 @@ func guiMain() {
 		}
 		urlEntry.SetText(u)
 		urlEntry.SetHExpand(true)
-		grid.RemoveRow(1)
-		grid.RemoveRow(0)
-		grid.InsertRow(0)
-		grid.Attach(urlEntry, 0, 0, 1, 1)
+		btn, err := grid.GetChildAt(0, 1)
+		if err != nil {
+			log.Fatal(err)
+		}
+		btn.Destroy()
+		grid.Attach(urlEntry, 0, 1, 3, 1)
 		grid.ShowAll()
 		win.Resize(1,1)
 	}()
