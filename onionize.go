@@ -32,6 +32,7 @@ import (
 type Parameters struct {
 	Path	string
 	Zip	bool
+	Slug	bool
 	ControlPath	string
 	ControlPassword	string
 	Passphrase	string
@@ -122,16 +123,20 @@ func main() {
 				log.Fatalf("Unable to get absolute path to file")
 			}
 			dir, file := filepath.Split(abspath)
-			slugBin := make([]byte, 5)
-			_, err = rand.Read(slugBin)
-			slug := onionutil.Base32Encode(slugBin)[:8]
+			var slug string
+			if p.Slug {
+				slugBin := make([]byte, 5)
+				_, err = rand.Read(slugBin)
+				slug = onionutil.Base32Encode(slugBin)[:8]
+				slug += "/"
+			}
 			m := make(map[string]string)
-			url = slug + "/" + file
+			url = slug + file
 			m[url] = file
 			fs = pickfs.New(vfs.OS(dir), m)
 			// Escape URL to be safe and copypasteble
 			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
-			url = slug + "/" + escapedFilename
+			url = slug + escapedFilename
 		}
 	}
 	// Serve our virtual filesystem
