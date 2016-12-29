@@ -84,6 +84,7 @@ func main() {
 	var fs vfs.FileSystem
 	var url string
 	var slug string
+	var slugPrefix string
 	if p.Slug {
 		slugBin := make([]byte, 5)
 		_, err := rand.Read(slugBin)
@@ -92,8 +93,8 @@ func main() {
 		}
 		slug = onionutil.Base32Encode(slugBin)[:8]
 		url += slug + "/"
+		slugPrefix = "/"+slug
 	}
-	slugPrefix := "/"+slug
 
 	if p.Zip {
 		// Serve contents of zip archive
