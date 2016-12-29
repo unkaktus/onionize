@@ -129,13 +129,15 @@ func main() {
 	// Serve our virtual filesystem
 	fileserver := http.FileServer(httpfs.New(fs))
 	http.HandleFunc(slugPrefix+"/", func(w http.ResponseWriter, req *http.Request) {
-		reqURL := req.URL.String()
-		if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
-			http.NotFound(w, req)
-			return
+		if p.Slug {
+			reqURL := req.URL.String()
+			if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
+				http.NotFound(w, req)
+				return
+			}
+			reqURL = strings.TrimLeft(reqURL, slugPrefix)
+			req.URL, _ = neturl.Parse(reqURL)
 		}
-		reqURL = strings.TrimLeft(reqURL, slugPrefix)
-		req.URL, _ = neturl.Parse(reqURL)
 		fileserver.ServeHTTP(w, req)
 	})
 
