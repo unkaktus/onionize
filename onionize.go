@@ -86,12 +86,12 @@ func main() {
 	var slug string
 	var slugPrefix string
 	if p.Slug {
-		slugBin := make([]byte, 5)
+		slugBin := make([]byte, 10)
 		_, err := rand.Read(slugBin)
 		if err != nil {
 			log.Fatalf("Unable to generate slug: %v", err)
 		}
-		slug = onionutil.Base32Encode(slugBin)[:8]
+		slug = onionutil.Base32Encode(slugBin)[:16]
 		url += slug + "/"
 		slugPrefix = "/"+slug
 	}
