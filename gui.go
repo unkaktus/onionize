@@ -30,6 +30,7 @@ func guiMain() {
 		log.Fatal("Unable to create window:", err)
 	}
 	win.SetTitle(applicationTitle)
+	win.SetIconName("folder-publicshare")
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
