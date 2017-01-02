@@ -42,6 +42,35 @@ type Parameters struct {
 var paramsCh = make(chan Parameters)
 var urlCh = make(chan string)
 
+func ResetHTTPConn(w *http.ResponseWriter) error {
+	hj, ok := (*w).(http.Hijacker)
+	if !ok {
+		return fmt.Errorf("This webserver doesn't support hijacking")
+	}
+	conn, _, err := hj.Hijack()
+	if err != nil {
+		return err
+	}
+	conn.Close()
+	return nil
+}
+
+func CheckAndRewriteSlug(req *http.Request, slugPrefix string) error {
+	if slugPrefix == "" {
+		return nil
+	}
+	reqURL := req.URL.String()
+	if len(reqURL) < len(slugPrefix) {
+		return fmt.Errorf("URL is too short to have a slug in it")
+	}
+	if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
+		return fmt.Errorf("Wrong slug")
+	}
+	reqURL = strings.TrimPrefix(reqURL, slugPrefix)
+	req.URL, _ = neturl.Parse(reqURL)
+	return nil
+}
+
 func main() {
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
@@ -128,21 +157,23 @@ func main() {
 	}
 	// Serve our virtual filesystem
 	fileserver := http.FileServer(httpfs.New(fs))
-	http.HandleFunc(slugPrefix+"/", func(w http.ResponseWriter, req *http.Request) {
-		if p.Slug {
-			reqURL := req.URL.String()
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		if debug {
+			log.Printf("Request for \"%s\"", req.URL)
+		}
+		err := CheckAndRewriteSlug(req, slugPrefix)
+		if err != nil {
 			if debug {
-				log.Printf("Request for \"%s\"", req.URL)
+				log.Print(err)
 			}
-			if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
-				http.NotFound(w, req)
-				return
+			err := ResetHTTPConn(&w)
+			if err != nil {
+				log.Printf("Unable to reset connection: %v", err)
 			}
-			reqURL = strings.TrimPrefix(reqURL, slugPrefix)
-			req.URL, _ = neturl.Parse(reqURL)
-			if debug {
-				log.Printf("Rewriting URL to \"%s\"", req.URL)
-			}
+			return
+		}
+		if debug {
+			log.Printf("Rewriting URL to \"%s\"", req.URL)
 		}
 		fileserver.ServeHTTP(w, req)
 	})
