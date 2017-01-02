@@ -74,6 +74,8 @@ func CheckAndRewriteSlug(req *http.Request, slugPrefix string) error {
 func main() {
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
+	var noslugFlag = flag.Bool("noslug", false,
+		"Do not use slugs")
 	var zipFlag = flag.Bool("zip", false,
 		"Serve zip file contents")
 	var passphraseFlag = flag.Bool("p", false,
@@ -93,6 +95,7 @@ func main() {
 				log.Fatalf("You should specify exactly one path")
 			}
 			p.Path = flag.Args()[0]
+			p.Slug = !*noslugFlag
 			p.Zip = *zipFlag
 			if *passphraseFlag {
 				fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
