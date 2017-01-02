@@ -28,6 +28,8 @@ import (
 	"golang.org/x/tools/godoc/vfs/zipfs"
 )
 
+const slugLengthB32 = 16
+
 type Parameters struct {
 	Path	string
 	Zip	bool
@@ -51,18 +53,18 @@ func ResetHTTPConn(w *http.ResponseWriter) error {
 	return nil
 }
 
-func CheckAndRewriteSlug(req *http.Request, slugPrefix string) error {
-	if slugPrefix == "" {
+func CheckAndRewriteSlug(req *http.Request, slug string) error {
+	if slug == "" {
 		return nil
 	}
-	reqURL := req.URL.String()
-	if len(reqURL) < len(slugPrefix) {
+	reqURL := strings.TrimLeft(req.URL.String(), "/")
+	if len(reqURL) < len(slug) {
 		return fmt.Errorf("URL is too short to have a slug in it")
 	}
-	if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
+	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(reqURL[:len(slug)])) {
 		return fmt.Errorf("Wrong slug")
 	}
-	reqURL = strings.TrimPrefix(reqURL, slugPrefix)
+	reqURL = strings.TrimPrefix(reqURL, slug)
 	req.URL, _ = neturl.Parse(reqURL)
 	return nil
 }
@@ -71,16 +73,14 @@ func Onionize(p Parameters, urlCh chan<- string) {
 	var fs vfs.FileSystem
 	var url string
 	var slug string
-	var slugPrefix string
 	if p.Slug {
-		slugBin := make([]byte, 10)
+		slugBin := make([]byte, (slugLengthB32*5)/8+1)
 		_, err := rand.Read(slugBin)
 		if err != nil {
 			log.Fatalf("Unable to generate slug: %v", err)
 		}
-		slug = onionutil.Base32Encode(slugBin)[:16]
+		slug = onionutil.Base32Encode(slugBin)[:slugLengthB32]
 		url += slug + "/"
-		slugPrefix = "/"+slug
 	}
 
 	if p.Zip {
@@ -119,7 +119,7 @@ func Onionize(p Parameters, urlCh chan<- string) {
 		if debug {
 			log.Printf("Request for \"%s\"", req.URL)
 		}
-		err := CheckAndRewriteSlug(req, slugPrefix)
+		err := CheckAndRewriteSlug(req, slug)
 		if err != nil {
 			if debug {
 				log.Print(err)
