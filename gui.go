@@ -13,13 +13,13 @@ import (
 	"os"
 
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/gotk3/gotk3/glib"
 )
 
 
 const applicationTitle = "onionize"
 
 var win *gtk.Window
-var grid *gtk.Grid
 
 func guiMain() {
 	gtk.Init(nil)
@@ -36,35 +36,15 @@ func guiMain() {
 	})
 	win.SetDefaultSize(1, 1)
 	win.SetResizable(false)
-	w := beforeWidget()
-	win.Add(w)
-
-	go func(){
-		u := <-urlCh
-		urlEntry, err := gtk.EntryNew()
-		if err != nil {
-			log.Fatal("Unable to create entry:", err)
-		}
-		urlEntry.SetText(u)
-		urlEntry.SetHExpand(true)
-		btn, err := grid.GetChildAt(0, 1)
-		if err != nil {
-			log.Fatal(err)
-		}
-		btn.Destroy()
-		grid.Attach(urlEntry, 0, 1, 3, 1)
-		grid.ShowAll()
-		win.Resize(1,1)
-	}()
+	win.Add(mainWidget())
 	win.ShowAll()
 
 	gtk.Main()
 	os.Exit(0)
 }
 
-func beforeWidget() *gtk.Widget {
-	var err error
-	grid, err = gtk.GridNew()
+func mainWidget() *gtk.Widget {
+	grid, err := gtk.GridNew()
 	if err != nil {
 		log.Fatal("Unable to create grid:", err)
 	}
@@ -159,6 +139,30 @@ func beforeWidget() *gtk.Widget {
 	})
 	grid.Attach(doBtn, 0, 1, 3, 1)
 
+	urlEntry, err := gtk.EntryNew()
+	if err != nil {
+		log.Fatal("Unable to create entry:", err)
+	}
+	urlEntry.SetHExpand(true)
+	go func(){
+		u := <-urlCh
+		_, err = glib.IdleAdd(urlEntry.SetText, u)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = glib.IdleAdd(doBtn.Destroy)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = glib.IdleAdd(grid.Attach, urlEntry, 0, 1, 3, 1)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = glib.IdleAdd(grid.ShowAll)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	return &grid.Container.Widget
 }
