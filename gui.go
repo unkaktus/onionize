@@ -158,6 +158,10 @@ func mainWidget() *gtk.Widget {
 		if err != nil {
 			log.Fatal(err)
 		}
+		_, err = glib.IdleAdd(urlEntry.SelectRegion, 0, len(u))
+		if err != nil {
+			log.Fatal(err)
+		}
 		_, err = glib.IdleAdd(grid.ShowAll)
 		if err != nil {
 			log.Fatal(err)
