@@ -8,8 +8,13 @@ Much love to onion services.
 
 Install
 -------
+CLI-only version:
 ```
 $ go get github.com/nogoegst/onionize
+```
+CLI + GUI version (reqiures GTK3 installed):
+```
+$ go get -tags gui github.com/nogoegst/onionize
 ```
 
 Usage
@@ -23,3 +28,16 @@ $ onionize [||-zip] /path/to/my/[directory|file|archive.zip]
 Grab the onion link from `stdout` and errors/info from `stderr`.
  
 That's it.
+
+GUI mode
+--------
+To run `onionize` in GUI mode just don't specify any path.
+Select target type, open your file/directory and click `onionize`:
+
+![onionize GUI screenshot](docs/onionize-dir-1.png)
+
+Then you can grab the link from a text field:
+
+![onionize GUI screenshot](docs/onionize-dir-2.png)
+
+You can find more screenshots in `docs`.
