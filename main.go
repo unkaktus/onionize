@@ -9,6 +9,8 @@ import(
 	"github.com/nogoegst/terminal"
 )
 
+var debug bool
+
 func main() {
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
@@ -25,11 +27,13 @@ func main() {
 	flag.Parse()
 
 	debug = *debugFlag
+	paramsCh := make(chan Parameters)
+	urlCh := make(chan string)
 
 	if len(flag.Args()) == 0 {
-		go guiMain()
+		go guiMain(paramsCh, urlCh)
 	} else {
-		go func() {
+		go func(paramsCh chan<- Parameters) {
 			p := Parameters{}
 			if len(flag.Args()) != 1 {
 				log.Fatalf("You should specify exactly one path")
@@ -50,9 +54,10 @@ func main() {
 			}
 			paramsCh <- p
 			fmt.Println(<-urlCh)
-		}()
+		}(paramsCh)
 	}
+
 	p := <-paramsCh
-	Onionize(p)
+	Onionize(p, urlCh)
 
 }

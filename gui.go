@@ -21,7 +21,7 @@ const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain() {
+func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 	gtk.Init(nil)
 
 	var err error
@@ -36,14 +36,8 @@ func guiMain() {
 	})
 	win.SetDefaultSize(1, 1)
 	win.SetResizable(false)
-	win.Add(mainWidget())
-	win.ShowAll()
 
-	gtk.Main()
-	os.Exit(0)
-}
 
-func mainWidget() *gtk.Widget {
 	grid, err := gtk.GridNew()
 	if err != nil {
 		log.Fatal("Unable to create grid:", err)
@@ -168,6 +162,10 @@ func mainWidget() *gtk.Widget {
 		}
 	}()
 
-	return &grid.Container.Widget
+	win.Add(&grid.Container.Widget)
+	win.ShowAll()
+
+	gtk.Main()
+	os.Exit(0)
 }
 

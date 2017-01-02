@@ -37,9 +37,6 @@ type Parameters struct {
 	Passphrase	string
 }
 
-var debug bool
-var paramsCh = make(chan Parameters)
-var urlCh = make(chan string)
 
 func ResetHTTPConn(w *http.ResponseWriter) error {
 	hj, ok := (*w).(http.Hijacker)
@@ -70,7 +67,7 @@ func CheckAndRewriteSlug(req *http.Request, slugPrefix string) error {
 	return nil
 }
 
-func Onionize(p Parameters) {
+func Onionize(p Parameters, urlCh chan<- string) {
 	var fs vfs.FileSystem
 	var url string
 	var slug string
