@@ -131,12 +131,18 @@ func main() {
 	http.HandleFunc(slugPrefix+"/", func(w http.ResponseWriter, req *http.Request) {
 		if p.Slug {
 			reqURL := req.URL.String()
+			if debug {
+				log.Printf("Request for \"%s\"", req.URL)
+			}
 			if 1 != subtle.ConstantTimeCompare([]byte(slugPrefix), []byte(reqURL[:len(slugPrefix)])) {
 				http.NotFound(w, req)
 				return
 			}
-			reqURL = strings.TrimLeft(reqURL, slugPrefix)
+			reqURL = strings.TrimPrefix(reqURL, slugPrefix)
 			req.URL, _ = neturl.Parse(reqURL)
+			if debug {
+				log.Printf("Rewriting URL to \"%s\"", req.URL)
+			}
 		}
 		fileserver.ServeHTTP(w, req)
 	})
