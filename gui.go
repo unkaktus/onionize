@@ -148,6 +148,8 @@ func beforeWidget() *gtk.Widget {
 		slugChkBox.SetSensitive(false)
 		grid.ShowAll()
 		p := Parameters{
+			ControlPath: "default://",
+			ControlPassword: "",
 			Path: path,
 			Zip:  "zip" == combo.GetActiveText(),
 			Slug: slugChkBox.GetActive(),
