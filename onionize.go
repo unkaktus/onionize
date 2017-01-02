@@ -10,7 +10,6 @@ package main
 import (
 	"archive/zip"
 	"crypto/rand"
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -24,7 +23,6 @@ import (
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/pickfs"
-	"github.com/nogoegst/terminal"
 	"golang.org/x/tools/godoc/vfs"
 	"golang.org/x/tools/godoc/vfs/httpfs"
 	"golang.org/x/tools/godoc/vfs/zipfs"
@@ -39,6 +37,7 @@ type Parameters struct {
 	Passphrase	string
 }
 
+var debug bool
 var paramsCh = make(chan Parameters)
 var urlCh = make(chan string)
 
@@ -71,48 +70,7 @@ func CheckAndRewriteSlug(req *http.Request, slugPrefix string) error {
 	return nil
 }
 
-func main() {
-	var debugFlag = flag.Bool("debug", false,
-		"Show what's happening")
-	var noslugFlag = flag.Bool("noslug", false,
-		"Do not use slugs")
-	var zipFlag = flag.Bool("zip", false,
-		"Serve zip file contents")
-	var passphraseFlag = flag.Bool("p", false,
-		"Ask for passphrase to generate onion key")
-	var control = flag.String("control-addr", "default://",
-		"Set Tor control address to be used")
-	var controlPasswd = flag.String("control-passwd", "",
-		"Set Tor control auth password")
-	flag.Parse()
-
-	if len(flag.Args()) == 0 {
-		go guiMain()
-	} else {
-		go func() {
-			p := Parameters{}
-			if len(flag.Args()) != 1 {
-				log.Fatalf("You should specify exactly one path")
-			}
-			p.Path = flag.Args()[0]
-			p.Slug = !*noslugFlag
-			p.Zip = *zipFlag
-			if *passphraseFlag {
-				fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
-				onionPassphrase, err := terminal.ReadPassword(0)
-				if err != nil {
-					log.Fatalf("Unable to read onion passphrase: %v", err)
-				}
-				fmt.Printf("\n")
-				p.Passphrase = string(onionPassphrase)
-			}
-			paramsCh <- p
-			fmt.Println(<-urlCh)
-		}()
-	}
-	debug := *debugFlag
-	p := <-paramsCh
-
+func Onionize(p Parameters) {
 	var fs vfs.FileSystem
 	var url string
 	var slug string
@@ -182,7 +140,7 @@ func main() {
 	})
 
 	// Connect to a running tor instance
-	c, err := bulb.DialURL(*control)
+	c, err := bulb.DialURL(p.ControlPath)
 	if err != nil {
 		log.Fatalf("Failed to connect to control socket: %v", err)
 	}
@@ -192,7 +150,7 @@ func main() {
 	c.Debug(debug)
 
 	// Authenticate with the control port
-	if err := c.Authenticate(*controlPasswd); err != nil {
+	if err := c.Authenticate(p.ControlPassword); err != nil {
 		log.Fatalf("Authentication failed: %v", err)
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
