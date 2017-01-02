@@ -158,9 +158,9 @@ func Onionize(p Parameters, urlCh chan<- string) {
 		if err != nil {
 			log.Fatalf("Unable to generate onion key: %v", err)
 		}
-		onionListener, err = c.Listener(80, privOnionKey)
+		onionListener, err = c.AwaitListener(80, privOnionKey)
 	} else {
-		onionListener, err = c.Listener(80, nil)
+		onionListener, err = c.AwaitListener(80, nil)
 	}
 	if err != nil {
 		log.Fatalf("Error occured while creating an onion service: %v", err)
@@ -169,23 +169,6 @@ func Onionize(p Parameters, urlCh chan<- string) {
 	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
 	if err != nil {
 		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
-	}
-	onionID := strings.TrimSuffix(onionHost, ".onion")
-	// Wait for service descriptor upload
-	c.StartAsyncReader()
-	if _, err := c.Request("SETEVENTS HS_DESC"); err != nil {
-		log.Fatalf("SETEVENTS HS_DESC has failed: %v", err)
-	}
-	eventPrefix := fmt.Sprintf("HS_DESC UPLOADED %s", onionID)
-
-	for {
-		ev, err := c.NextEvent()
-		if err != nil {
-			log.Fatalf("NextEvent has failed: %v", err)
-		}
-		if strings.HasPrefix(ev.Reply, eventPrefix) {
-			break
-		}
 	}
 	// Display the link to the service
 	urlCh <- fmt.Sprintf("http://%s/%s", onionHost, url)
