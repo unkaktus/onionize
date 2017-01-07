@@ -82,7 +82,8 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		slugBin := make([]byte, (slugLengthB32*5)/8+1)
 		_, err := rand.Read(slugBin)
 		if err != nil {
-			log.Fatalf("Unable to generate slug: %v", err)
+			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate slug: %v", err)}
+			return
 		}
 		slug = onionutil.Base32Encode(slugBin)[:slugLengthB32]
 		url += slug + "/"
@@ -92,13 +93,15 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		// Serve contents of zip archive
 		rcZip, err := zip.OpenReader(p.Path)
 		if err != nil {
-			log.Fatalf("Unable to open zip archive: %v", err)
+			linkCh <- ResultLink{Error: fmt.Errorf("Unable to open zip archive: %v", err)}
+			return
 		}
 		fs = zipfs.New(rcZip, "onionize")
 	} else {
 		fileInfo, err := os.Stat(p.Path)
 		if err != nil {
-			log.Fatalf("Unable to open path: %v", err)
+			linkCh <- ResultLink{Error: fmt.Errorf("Unable to open path: %v", err)}
+			return
 		}
 		if fileInfo.IsDir() {
 			// Serve a plain directory
@@ -107,7 +110,8 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			// Serve just one file in OnionShare-like manner
 			abspath, err := filepath.Abs(p.Path)
 			if err != nil {
-				log.Fatalf("Unable to get absolute path to file")
+				linkCh <- ResultLink{Error: fmt.Errorf("Unable to get absolute path to file")}
+				return
 			}
 			dir, file := filepath.Split(abspath)
 			m := make(map[string]string)
@@ -144,7 +148,8 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	// Connect to a running tor instance
 	c, err := bulb.DialURL(p.ControlPath)
 	if err != nil {
-		log.Fatalf("Failed to connect to control socket: %v", err)
+		linkCh <- ResultLink{Error: fmt.Errorf("Failed to connect to control socket: %v", err)}
+		return
 	}
 	defer c.Close()
 
@@ -153,7 +158,8 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 
 	// Authenticate with the control port
 	if err := c.Authenticate(p.ControlPassword); err != nil {
-		log.Fatalf("Authentication failed: %v", err)
+		linkCh <- ResultLink{Error: fmt.Errorf("Authentication failed: %v", err)}
+		return
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
 	var onionListener net.Listener
@@ -161,22 +167,25 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	if p.Passphrase != "" {
 		privOnionKey, err := onionutil.GenerateOnionKey(onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen")))
 		if err != nil {
-			log.Fatalf("Unable to generate onion key: %v", err)
+			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate onion key: %v", err)}
+			return
 		}
 		onionListener, err = c.AwaitListener(80, privOnionKey)
 	} else {
 		onionListener, err = c.AwaitListener(80, nil)
 	}
 	if err != nil {
-		log.Fatalf("Error occured while creating an onion service: %v", err)
+		linkCh <- ResultLink{Error: fmt.Errorf("Error occured while creating an onion service: %v", err)}
+		return
 	}
 	defer onionListener.Close()
 	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
 	if err != nil {
-		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
+		linkCh <- ResultLink{Error: fmt.Errorf("Unable to derive onionID from listener.Addr(): %v", err)}
+		return
 	}
 	// Return th link to the service
-	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url), Error: nil}
+	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url)}
 	// Run webservice
 	err = http.Serve(onionListener, nil)
 	if err != nil {

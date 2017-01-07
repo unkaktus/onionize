@@ -160,6 +160,9 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	urlEntry.SetHExpand(true)
 	go func(){
 		link := <-linkCh
+		if link.Error != nil {
+			log.Fatal(link.Error)
+		}
 		_, err = glib.IdleAdd(urlEntry.SetText, link.URL)
 		if err != nil {
 			log.Fatal(err)

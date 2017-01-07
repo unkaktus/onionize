@@ -30,38 +30,39 @@ func main() {
 	paramsCh := make(chan Parameters)
 	linkCh := make(chan ResultLink)
 
+	go func() {
+		for p := range paramsCh {
+			go Onionize(p, linkCh)
+		}
+	}()
+
 	if len(flag.Args()) == 0 {
-		go guiMain(paramsCh, linkCh)
+		guiMain(paramsCh, linkCh)
 	} else {
-		go func(paramsCh chan<- Parameters) {
-			p := Parameters{}
-			if len(flag.Args()) != 1 {
-				log.Fatalf("You should specify exactly one path")
+		p := Parameters{}
+		if len(flag.Args()) != 1 {
+			log.Fatalf("You should specify exactly one path")
+		}
+		p.ControlPath = *control
+		p.ControlPassword = *controlPasswd
+		p.Path = flag.Args()[0]
+		p.Slug = !*noslugFlag
+		p.Zip = *zipFlag
+		if *passphraseFlag {
+			fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
+			onionPassphrase, err := terminal.ReadPassword(0)
+			if err != nil {
+				log.Fatalf("Unable to read onion passphrase: %v", err)
 			}
-			p.ControlPath = *control
-			p.ControlPassword = *controlPasswd
-			p.Path = flag.Args()[0]
-			p.Slug = !*noslugFlag
-			p.Zip = *zipFlag
-			if *passphraseFlag {
-				fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
-				onionPassphrase, err := terminal.ReadPassword(0)
-				if err != nil {
-					log.Fatalf("Unable to read onion passphrase: %v", err)
-				}
-				fmt.Printf("\n")
-				p.Passphrase = string(onionPassphrase)
-			}
-			paramsCh <- p
-			link := <-linkCh
+			fmt.Printf("\n")
+			p.Passphrase = string(onionPassphrase)
+		}
+		paramsCh <- p
+		for link := range linkCh {
 			if link.Error != nil {
 				log.Fatal(link.Error)
 			}
 			fmt.Println(link.URL)
-		}(paramsCh)
+		}
 	}
-
-	p := <-paramsCh
-	Onionize(p, linkCh)
-
 }
