@@ -34,6 +34,7 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
+	win.SetBorderWidth(5)
 	win.SetDefaultSize(1, 1)
 	win.SetResizable(false)
 
