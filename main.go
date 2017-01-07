@@ -28,10 +28,10 @@ func main() {
 
 	debug = *debugFlag
 	paramsCh := make(chan Parameters)
-	urlCh := make(chan string)
+	linkCh := make(chan ResultLink)
 
 	if len(flag.Args()) == 0 {
-		go guiMain(paramsCh, urlCh)
+		go guiMain(paramsCh, linkCh)
 	} else {
 		go func(paramsCh chan<- Parameters) {
 			p := Parameters{}
@@ -53,11 +53,15 @@ func main() {
 				p.Passphrase = string(onionPassphrase)
 			}
 			paramsCh <- p
-			fmt.Println(<-urlCh)
+			link := <-linkCh
+			if link.Error != nil {
+				log.Fatal(link.Error)
+			}
+			fmt.Println(link.URL)
 		}(paramsCh)
 	}
 
 	p := <-paramsCh
-	Onionize(p, urlCh)
+	Onionize(p, linkCh)
 
 }

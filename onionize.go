@@ -69,7 +69,12 @@ func CheckAndRewriteSlug(req *http.Request, slug string) error {
 	return nil
 }
 
-func Onionize(p Parameters, urlCh chan<- string) {
+type ResultLink struct {
+	URL	string
+	Error	error
+}
+
+func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	var fs vfs.FileSystem
 	var url string
 	var slug string
@@ -170,8 +175,8 @@ func Onionize(p Parameters, urlCh chan<- string) {
 	if err != nil {
 		log.Fatalf("Unable to derive onionID from listener.Addr(): %v", err)
 	}
-	// Display the link to the service
-	urlCh <- fmt.Sprintf("http://%s/%s", onionHost, url)
+	// Return th link to the service
+	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url), Error: nil}
 	// Run webservice
 	err = http.Serve(onionListener, nil)
 	if err != nil {

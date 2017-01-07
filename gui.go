@@ -21,7 +21,7 @@ const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
+func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	gtk.Init(nil)
 
 	var err error
@@ -159,8 +159,8 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 	}
 	urlEntry.SetHExpand(true)
 	go func(){
-		u := <-urlCh
-		_, err = glib.IdleAdd(urlEntry.SetText, u)
+		link := <-linkCh
+		_, err = glib.IdleAdd(urlEntry.SetText, link.URL)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -172,7 +172,7 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = glib.IdleAdd(urlEntry.SelectRegion, 0, len(u))
+		_, err = glib.IdleAdd(urlEntry.SelectRegion, 0, len(link.URL))
 		if err != nil {
 			log.Fatal(err)
 		}
