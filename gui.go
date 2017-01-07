@@ -51,7 +51,20 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 		log.Fatal(err)
 	}
 	slugChkBox.SetActive(true)
-	grid.Attach(slugChkBox, 2, 0, 1, 1)
+	slugChkBox.SetHAlign(gtk.ALIGN_CENTER)
+	grid.Attach(slugChkBox, 0, 1, 1, 1)
+
+
+	passphraseEntry, err := gtk.EntryNew()
+	if err != nil {
+		log.Fatal("Unable to create entry:", err)
+	}
+	passphraseEntry.SetHExpand(true)
+	passphraseEntry.SetPlaceholderText("passphrase")
+	passphraseEntry.SetInputPurpose(gtk.INPUT_PURPOSE_PASSWORD)
+	passphraseEntry.SetVisibility(false)
+
+	grid.Attach(passphraseEntry, 1, 1, 1, 1)
 
 	combo, err := gtk.ComboBoxTextNew()
 	if err != nil {
@@ -120,18 +133,24 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 		doBtn.SetLabel("onionizing...")
 		combo.SetSensitive(false)
 		slugChkBox.SetSensitive(false)
+		passphraseEntry.SetSensitive(false)
 		grid.ShowAll()
+		passphrase, err := passphraseEntry.GetText()
+		if err != nil {
+			log.Fatalf("Unable to get passphrase: %v", err)
+		}
 		p := Parameters{
 			ControlPath: "default://",
 			ControlPassword: "",
 			Path: path,
 			Zip:  "zip" == combo.GetActiveText(),
 			Slug: slugChkBox.GetActive(),
+			Passphrase: passphrase,
 		}
 		paramsCh <- p
 
 	})
-	grid.Attach(doBtn, 0, 1, 3, 1)
+	grid.Attach(doBtn, 0, 2, 2, 1)
 
 	urlEntry, err := gtk.EntryNew()
 	if err != nil {
@@ -148,7 +167,7 @@ func guiMain(paramsCh chan<- Parameters, urlCh <-chan string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = glib.IdleAdd(grid.Attach, urlEntry, 0, 1, 3, 1)
+		_, err = glib.IdleAdd(grid.Attach, urlEntry, 0, 2, 2, 1)
 		if err != nil {
 			log.Fatal(err)
 		}
