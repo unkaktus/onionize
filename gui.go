@@ -61,7 +61,7 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		log.Fatal("Unable to create entry:", err)
 	}
 	passphraseEntry.SetHExpand(true)
-	passphraseEntry.SetPlaceholderText("passphrase")
+	passphraseEntry.SetPlaceholderText("identity passphrase")
 	passphraseEntry.SetInputPurpose(gtk.INPUT_PURPOSE_PASSWORD)
 	passphraseEntry.SetVisibility(false)
 
