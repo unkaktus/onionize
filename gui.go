@@ -161,7 +161,14 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	go func(){
 		link := <-linkCh
 		if link.Error != nil {
-			log.Fatal(link.Error)
+			errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, link.Error.Error())
+			_, err = glib.IdleAdd(func () {
+				errDialog.Run()
+				os.Exit(1)
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		_, err = glib.IdleAdd(urlEntry.SetText, link.URL)
 		if err != nil {
