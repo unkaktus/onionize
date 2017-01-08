@@ -124,7 +124,8 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	}
 	// Serve our virtual filesystem
 	fileserver := http.FileServer(httpfs.New(fs))
-	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		if debug {
 			log.Printf("Request for \"%s\"", req.URL)
 		}
@@ -144,6 +145,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		}
 		fileserver.ServeHTTP(w, req)
 	})
+	server := &http.Server{Handler: mux}
 
 	// Connect to a running tor instance
 	c, err := bulb.DialURL(p.ControlPath)
@@ -187,7 +189,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	// Return th link to the service
 	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url)}
 	// Run webservice
-	err = http.Serve(onionListener, nil)
+	err = server.Serve(onionListener)
 	if err != nil {
 		log.Fatalf("Cannot serve HTTP")
 	}
