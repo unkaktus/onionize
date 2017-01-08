@@ -181,14 +181,23 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		return
 	}
 	defer onionListener.Close()
+	// Track if tor went down
+	go func() {
+		for {
+			_, err := c.NextEvent()
+			if err != nil {
+				log.Fatalf("Lost connection to tor: %v", err)
+			}
+		}
+	}()
 	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
 	if err != nil {
 		linkCh <- ResultLink{Error: fmt.Errorf("Unable to derive onionID from listener.Addr(): %v", err)}
 		return
 	}
-	// Return th link to the service
+	// Return the link to the service
 	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url)}
-	// Run webservice
+	// Run a webservice
 	err = server.Serve(onionListener)
 	if err != nil {
 		log.Fatalf("Cannot serve HTTP")
