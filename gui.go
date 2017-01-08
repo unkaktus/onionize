@@ -170,23 +170,13 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 				log.Fatal(err)
 			}
 		}
-		_, err = glib.IdleAdd(urlEntry.SetText, link.URL)
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = glib.IdleAdd(doBtn.Destroy)
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = glib.IdleAdd(grid.Attach, urlEntry, 0, 2, 2, 1)
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = glib.IdleAdd(urlEntry.SelectRegion, 0, len(link.URL))
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = glib.IdleAdd(grid.ShowAll)
+		_, err = glib.IdleAdd(func() {
+			urlEntry.SetText(link.URL)
+			doBtn.Destroy()
+			grid.Attach(urlEntry, 0, 2, 2, 1)
+			urlEntry.SelectRegion(0, len(link.URL))
+			grid.ShowAll()
+		})
 		if err != nil {
 			log.Fatal(err)
 		}
