@@ -191,10 +191,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		}
 	}()
 	onionHost := strings.TrimSuffix(onionListener.Addr().String(), ":80")
-	if err != nil {
-		linkCh <- ResultLink{Error: fmt.Errorf("Unable to derive onionID from listener.Addr(): %v", err)}
-		return
-	}
+
 	// Return the link to the service
 	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, url)}
 	// Run a webservice
