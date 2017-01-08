@@ -124,11 +124,7 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		log.Fatal("Unable to create button:", err)
 	}
 
-	doBtn.Connect("clicked", func() {
-		path := fchooserBtn.GetFilename()
-		if path == "" {
-			return
-		}
+	fadeOut := func() {
 		fchooserBtn.SetSensitive(false)
 		doBtn.SetSensitive(false)
 		doBtn.SetLabel("onionizing...")
@@ -136,10 +132,29 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		slugChkBox.SetSensitive(false)
 		passphraseEntry.SetSensitive(false)
 		grid.ShowAll()
+	}
+
+	fadeIn := func() {
+		fchooserBtn.SetSensitive(true)
+		doBtn.SetSensitive(true)
+		doBtn.SetLabel("onionize")
+		combo.SetSensitive(true)
+		slugChkBox.SetSensitive(true)
+		passphraseEntry.SetSensitive(true)
+		grid.ShowAll()
+	}
+
+
+	doBtn.Connect("clicked", func() {
+		path := fchooserBtn.GetFilename()
+		if path == "" {
+			return
+		}
 		passphrase, err := passphraseEntry.GetText()
 		if err != nil {
 			log.Fatalf("Unable to get passphrase: %v", err)
 		}
+		fadeOut()
 		p := Parameters{
 			ControlPath: "default://",
 			ControlPassword: "",
@@ -159,26 +174,29 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	}
 	urlEntry.SetHExpand(true)
 	go func(){
-		link := <-linkCh
-		if link.Error != nil {
-			errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, link.Error.Error())
-			_, err = glib.IdleAdd(func () {
-				errDialog.Run()
-				os.Exit(1)
-			})
-			if err != nil {
-				log.Fatal(err)
+		for link := range linkCh {
+			if link.Error != nil {
+				errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, link.Error.Error())
+				_, err = glib.IdleAdd(func () {
+					errDialog.Run()
+					errDialog.Destroy()
+					fadeIn()
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else {
+				_, err = glib.IdleAdd(func() {
+					urlEntry.SetText(link.URL)
+					doBtn.Destroy()
+					grid.Attach(urlEntry, 0, 2, 2, 1)
+					urlEntry.SelectRegion(0, len(link.URL))
+					grid.ShowAll()
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
-		}
-		_, err = glib.IdleAdd(func() {
-			urlEntry.SetText(link.URL)
-			doBtn.Destroy()
-			grid.Attach(urlEntry, 0, 2, 2, 1)
-			urlEntry.SelectRegion(0, len(link.URL))
-			grid.ShowAll()
-		})
-		if err != nil {
-			log.Fatal(err)
 		}
 	}()
 
