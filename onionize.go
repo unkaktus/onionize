@@ -190,7 +190,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			}
 		}
 	}()
-	onionHost, _, err := net.SplitHostPort(onionListener.Addr().String())
+	onionHost := strings.TrimSuffix(onionListener.Addr().String(), ":80")
 	if err != nil {
 		linkCh <- ResultLink{Error: fmt.Errorf("Unable to derive onionID from listener.Addr(): %v", err)}
 		return
