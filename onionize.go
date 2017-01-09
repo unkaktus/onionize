@@ -167,7 +167,12 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	var onionListener net.Listener
 
 	if p.Passphrase != "" {
-		privOnionKey, err := onionutil.GenerateOnionKey(onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen")))
+		keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
+		if err != nil {
+			linkCh <- ResultLink{Error: fmt.Errorf("Unable to create keystream: %v", err)}
+			return
+		}
+		privOnionKey, err := onionutil.GenerateOnionKey(keyrd)
 		if err != nil {
 			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate onion key: %v", err)}
 			return
