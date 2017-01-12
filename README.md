@@ -41,3 +41,12 @@ Then you can grab the link from a text field:
 ![onionize GUI screenshot](docs/onionize-dir-2.png)
 
 You can find more screenshots in `docs`.
+
+Identity passphrase
+-------------------
+
+You may also specify a passphrase from which onion service identity key
+will be derived. Thus you can preserve same .onion address across setups.
+
+Identity passphrase can be specified on `stdin` by setting `-p` flag in CLI
+or in corresponding field in GUI.
