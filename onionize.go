@@ -12,7 +12,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	neturl "net/url"
 	"os"
@@ -164,8 +163,10 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 		return
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
-	var onionListener net.Listener
-
+	aocfg := &bulb.NewOnionConfig{
+		DiscardPK: true,
+		AwaitForUpload: true,
+	}
 	if p.Passphrase != "" {
 		keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
 		if err != nil {
@@ -177,10 +178,9 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate onion key: %v", err)}
 			return
 		}
-		onionListener, err = c.AwaitListener(80, privOnionKey)
-	} else {
-		onionListener, err = c.AwaitListener(80, nil)
+		aocfg.PrivateKey = privOnionKey
 	}
+	onionListener, err := c.NewListener(aocfg, 80)
 	if err != nil {
 		linkCh <- ResultLink{Error: fmt.Errorf("Error occured while creating an onion service: %v", err)}
 		return
