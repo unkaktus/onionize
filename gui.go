@@ -12,10 +12,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/glib"
+	"github.com/gotk3/gotk3/gtk"
 )
-
 
 const applicationTitle = "onionize"
 
@@ -38,7 +37,6 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	win.SetDefaultSize(1, 1)
 	win.SetResizable(false)
 
-
 	grid, err := gtk.GridNew()
 	if err != nil {
 		log.Fatal("Unable to create grid:", err)
@@ -54,7 +52,6 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	slugChkBox.SetActive(true)
 	slugChkBox.SetHAlign(gtk.ALIGN_CENTER)
 	grid.Attach(slugChkBox, 0, 1, 1, 1)
-
 
 	passphraseEntry, err := gtk.EntryNew()
 	if err != nil {
@@ -118,7 +115,6 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	})
 	updateFileChooser("file")
 
-
 	doBtn, err := gtk.ButtonNewWithLabel("onionize")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
@@ -144,7 +140,6 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		grid.ShowAll()
 	}
 
-
 	doBtn.Connect("clicked", func() {
 		path := fchooserBtn.GetFilename()
 		if path == "" {
@@ -156,12 +151,12 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		}
 		fadeOut()
 		p := Parameters{
-			ControlPath: "default://",
+			ControlPath:     "default://",
 			ControlPassword: "",
-			Path: path,
-			Zip:  "zip" == combo.GetActiveText(),
-			Slug: slugChkBox.GetActive(),
-			Passphrase: passphrase,
+			Path:            path,
+			Zip:             "zip" == combo.GetActiveText(),
+			Slug:            slugChkBox.GetActive(),
+			Passphrase:      passphrase,
 		}
 		paramsCh <- p
 
@@ -173,11 +168,11 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 		log.Fatal("Unable to create entry:", err)
 	}
 	urlEntry.SetHExpand(true)
-	go func(){
+	go func() {
 		for link := range linkCh {
 			if link.Error != nil {
 				errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, link.Error.Error())
-				_, err = glib.IdleAdd(func () {
+				_, err = glib.IdleAdd(func() {
 					errDialog.Run()
 					errDialog.Destroy()
 					fadeIn()
@@ -206,4 +201,3 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 	gtk.Main()
 	os.Exit(0)
 }
-

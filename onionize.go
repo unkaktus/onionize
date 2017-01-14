@@ -10,6 +10,7 @@ package main
 import (
 	"archive/zip"
 	"crypto/rand"
+	"crypto/subtle"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,7 +18,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"crypto/subtle"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
@@ -30,14 +30,13 @@ import (
 const slugLengthB32 = 16
 
 type Parameters struct {
-	Path	string
-	Zip	bool
-	Slug	bool
-	ControlPath	string
-	ControlPassword	string
-	Passphrase	string
+	Path            string
+	Zip             bool
+	Slug            bool
+	ControlPath     string
+	ControlPassword string
+	Passphrase      string
 }
-
 
 func ResetHTTPConn(w *http.ResponseWriter) error {
 	hj, ok := (*w).(http.Hijacker)
@@ -69,8 +68,8 @@ func CheckAndRewriteSlug(req *http.Request, slug string) error {
 }
 
 type ResultLink struct {
-	URL	string
-	Error	error
+	URL   string
+	Error error
 }
 
 func Onionize(p Parameters, linkCh chan<- ResultLink) {
@@ -164,7 +163,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
 	aocfg := &bulb.NewOnionConfig{
-		DiscardPK: true,
+		DiscardPK:      true,
 		AwaitForUpload: true,
 	}
 	if p.Passphrase != "" {

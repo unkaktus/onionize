@@ -1,9 +1,9 @@
-
 package main
-import(
+
+import (
 	"flag"
-	"log"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/nogoegst/terminal"
