@@ -138,6 +138,9 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			}
 			return
 		}
+		if req.URL.String() == "" { // empty root path
+			http.Redirect(w, req,"/"+slug+"/", http.StatusFound)
+		}
 		if debug {
 			log.Printf("Rewriting URL to \"%s\"", req.URL)
 		}
