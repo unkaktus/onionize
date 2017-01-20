@@ -11,5 +11,5 @@ package main
 import "log"
 
 func guiMain(chan Parameters, chan ResultLink) {
-	log.Fatal("This version of onionize is built without GUI support")
+	log.Fatal("Please specify path to target")
 }
