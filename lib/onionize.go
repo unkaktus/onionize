@@ -5,7 +5,7 @@
 // commons "cc0" public domain dedication. See LICENSE or
 // <http://creativecommons.org/publicdomain/zero/1.0/> for full details.
 
-package main
+package onionize
 
 import (
 	"archive/zip"
@@ -36,6 +36,7 @@ type Parameters struct {
 	ControlPath     string
 	ControlPassword string
 	Passphrase      string
+	Debug           bool
 }
 
 func ResetHTTPConn(w *http.ResponseWriter) error {
@@ -124,12 +125,12 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	fileserver := http.FileServer(httpfs.New(fs))
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if debug {
+		if p.Debug {
 			log.Printf("Request for \"%s\"", req.URL)
 		}
 		err := CheckAndRewriteSlug(req, slug)
 		if err != nil {
-			if debug {
+			if p.Debug {
 				log.Print(err)
 			}
 			err := ResetHTTPConn(&w)
@@ -139,9 +140,9 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			return
 		}
 		if req.URL.String() == "" { // empty root path
-			http.Redirect(w, req,"/"+slug+"/", http.StatusFound)
+			http.Redirect(w, req, "/"+slug+"/", http.StatusFound)
 		}
-		if debug {
+		if p.Debug {
 			log.Printf("Rewriting URL to \"%s\"", req.URL)
 		}
 		fileserver.ServeHTTP(w, req)
@@ -157,7 +158,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	defer c.Close()
 
 	// See what's really going on under the hood
-	c.Debug(debug)
+	c.Debug(p.Debug)
 
 	// Authenticate with the control port
 	if err := c.Authenticate(p.ControlPassword); err != nil {

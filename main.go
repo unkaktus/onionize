@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	libonionize "github.com/nogoegst/onionize/lib"
 	"github.com/nogoegst/terminal"
 )
 
@@ -27,27 +28,29 @@ func main() {
 	flag.Parse()
 
 	debug = *debugFlag
-	paramsCh := make(chan Parameters)
-	linkCh := make(chan ResultLink)
+	paramsCh := make(chan libonionize.Parameters)
+	linkCh := make(chan libonionize.ResultLink)
 
 	go func() {
 		for p := range paramsCh {
-			go Onionize(p, linkCh)
+			go libonionize.Onionize(p, linkCh)
 		}
 	}()
 
 	if len(flag.Args()) == 0 {
 		guiMain(paramsCh, linkCh)
 	} else {
-		p := Parameters{}
 		if len(flag.Args()) != 1 {
 			log.Fatalf("You should specify exactly one path")
 		}
-		p.ControlPath = *control
-		p.ControlPassword = *controlPasswd
-		p.Path = flag.Args()[0]
-		p.Slug = !*noslugFlag
-		p.Zip = *zipFlag
+		p := libonionize.Parameters{
+			Debug:           debug,
+			ControlPath:     *control,
+			ControlPassword: *controlPasswd,
+			Path:            flag.Args()[0],
+			Slug:            !*noslugFlag,
+			Zip:             *zipFlag,
+		}
 		if *passphraseFlag {
 			fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
 			onionPassphrase, err := terminal.ReadPassword(0)

@@ -8,8 +8,12 @@
 
 package main
 
-import "log"
+import (
+	"log"
 
-func guiMain(chan Parameters, chan ResultLink) {
+	libonionize "github.com/nogoegst/onionize/lib"
+)
+
+func guiMain(chan libonionize.Parameters, chan libonionize.ResultLink) {
 	log.Fatal("Please specify path to target")
 }

@@ -14,13 +14,14 @@ import (
 
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	libonionize "github.com/nogoegst/onionize/lib"
 )
 
 const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
+func guiMain(paramsCh chan<- libonionize.Parameters, linkCh <-chan libonionize.ResultLink) {
 	gtk.Init(nil)
 
 	var err error
@@ -150,7 +151,8 @@ func guiMain(paramsCh chan<- Parameters, linkCh <-chan ResultLink) {
 			log.Fatalf("Unable to get passphrase: %v", err)
 		}
 		fadeOut()
-		p := Parameters{
+		p := libonionize.Parameters{
+			Debug:           debug,
 			ControlPath:     "default://",
 			ControlPassword: "",
 			Path:            path,
