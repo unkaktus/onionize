@@ -150,6 +150,9 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	server := &http.Server{Handler: mux}
 
 	// Connect to a running tor instance
+	if p.ControlPath == "" {
+		p.ControlPath = "default://"
+	}
 	c, err := bulb.DialURL(p.ControlPath)
 	if err != nil {
 		linkCh <- ResultLink{Error: fmt.Errorf("Failed to connect to control socket: %v", err)}
@@ -176,7 +179,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 			linkCh <- ResultLink{Error: fmt.Errorf("Unable to create keystream: %v", err)}
 			return
 		}
-		privOnionKey, err := onionutil.GenerateOnionKey(keyrd)
+		privOnionKey, err := onionutil.GenerateOnionKey(keyrd, "current")
 		if err != nil {
 			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate onion key: %v", err)}
 			return
