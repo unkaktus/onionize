@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	neturl "net/url"
 	"os"
 	"path/filepath"
@@ -74,80 +75,92 @@ type ResultLink struct {
 }
 
 func Onionize(p Parameters, linkCh chan<- ResultLink) {
+	var handler http.Handler
 	var fs vfs.FileSystem
 	var url string
 	var slug string
-	if p.Slug {
-		slugBin := make([]byte, (slugLengthB32*5)/8+1)
-		_, err := rand.Read(slugBin)
-		if err != nil {
-			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate slug: %v", err)}
-			return
-		}
-		slug = onionutil.Base32Encode(slugBin)[:slugLengthB32]
-		url += slug + "/"
+	target, err := neturl.Parse(p.Path)
+	if err != nil {
+		linkCh <- ResultLink{Error: fmt.Errorf("Unable to parse target URL: %v", err)}
+		return
 	}
-
-	if p.Zip {
-		// Serve contents of zip archive
-		rcZip, err := zip.OpenReader(p.Path)
-		if err != nil {
-			linkCh <- ResultLink{Error: fmt.Errorf("Unable to open zip archive: %v", err)}
-			return
-		}
-		fs = zipfs.New(rcZip, "onionize")
-	} else {
-		fileInfo, err := os.Stat(p.Path)
-		if err != nil {
-			linkCh <- ResultLink{Error: fmt.Errorf("Unable to open path: %v", err)}
-			return
-		}
-		if fileInfo.IsDir() {
-			// Serve a plain directory
-			fs = vfs.OS(p.Path)
-		} else {
-			// Serve just one file in OnionShare-like manner
-			abspath, err := filepath.Abs(p.Path)
+	switch target.Scheme {
+	case "http", "https":
+			handler = httputil.NewSingleHostReverseProxy(target)
+	default:
+		if p.Slug {
+			slugBin := make([]byte, (slugLengthB32*5)/8+1)
+			_, err := rand.Read(slugBin)
 			if err != nil {
-				linkCh <- ResultLink{Error: fmt.Errorf("Unable to get absolute path to file")}
+				linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate slug: %v", err)}
 				return
 			}
-			dir, file := filepath.Split(abspath)
-			m := make(map[string]string)
-			m[file] = file
-			fs = pickfs.New(vfs.OS(dir), m)
-			// Escape URL to be safe and copypasteble
-			escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
-			url += escapedFilename
+			slug = onionutil.Base32Encode(slugBin)[:slugLengthB32]
+			url += slug + "/"
 		}
-	}
-	// Serve our virtual filesystem
-	fileserver := http.FileServer(httpfs.New(fs))
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if p.Debug {
-			log.Printf("Request for \"%s\"", req.URL)
-		}
-		err := CheckAndRewriteSlug(req, slug)
-		if err != nil {
-			if p.Debug {
-				log.Print(err)
-			}
-			err := ResetHTTPConn(&w)
+
+		if p.Zip {
+			// Serve contents of zip archive
+			rcZip, err := zip.OpenReader(p.Path)
 			if err != nil {
-				log.Printf("Unable to reset connection: %v", err)
+				linkCh <- ResultLink{Error: fmt.Errorf("Unable to open zip archive: %v", err)}
+				return
 			}
-			return
+			fs = zipfs.New(rcZip, "onionize")
+		} else {
+			fileInfo, err := os.Stat(p.Path)
+			if err != nil {
+				linkCh <- ResultLink{Error: fmt.Errorf("Unable to open path: %v", err)}
+				return
+			}
+			if fileInfo.IsDir() {
+				// Serve a plain directory
+				fs = vfs.OS(p.Path)
+			} else {
+				// Serve just one file in OnionShare-like manner
+				abspath, err := filepath.Abs(p.Path)
+				if err != nil {
+					linkCh <- ResultLink{Error: fmt.Errorf("Unable to get absolute path to file")}
+					return
+				}
+				dir, file := filepath.Split(abspath)
+				m := make(map[string]string)
+				m[file] = file
+				fs = pickfs.New(vfs.OS(dir), m)
+				// Escape URL to be safe and copypasteble
+				escapedFilename := strings.Replace(neturl.QueryEscape(file), "+", "%20", -1)
+				url += escapedFilename
+			}
 		}
-		if req.URL.String() == "" { // empty root path
-			http.Redirect(w, req, "/"+slug+"/", http.StatusFound)
-		}
-		if p.Debug {
-			log.Printf("Rewriting URL to \"%s\"", req.URL)
-		}
-		fileserver.ServeHTTP(w, req)
-	})
-	server := &http.Server{Handler: mux}
+		// Serve our virtual filesystem
+		fileserver := http.FileServer(httpfs.New(fs))
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+			if p.Debug {
+				log.Printf("Request for \"%s\"", req.URL)
+			}
+			err := CheckAndRewriteSlug(req, slug)
+			if err != nil {
+				if p.Debug {
+					log.Print(err)
+				}
+				err := ResetHTTPConn(&w)
+				if err != nil {
+					log.Printf("Unable to reset connection: %v", err)
+				}
+				return
+			}
+			if req.URL.String() == "" { // empty root path
+				http.Redirect(w, req, "/"+slug+"/", http.StatusFound)
+			}
+			if p.Debug {
+				log.Printf("Rewriting URL to \"%s\"", req.URL)
+			}
+			fileserver.ServeHTTP(w, req)
+		})
+		handler = mux
+	}
+	server := &http.Server{Handler: handler}
 
 	// Connect to a running tor instance
 	if p.ControlPath == "" {

@@ -1,7 +1,7 @@
 onionize
 ===========
-Make an onion site (aka HTTP over onion services) up and running from any a
-directory/file/zip archive.
+Make an onion site (aka HTTP over onion services) up and running from a
+directory, a file, zip archive contents or another HTTP server.
 
 Onion services are end-to-end encrypted, metadata-free and forward-secure
 (see [design overview](https://www.torproject.org/docs/hidden-services.html.en)).
@@ -20,11 +20,18 @@ $ go get -tags gui github.com/nogoegst/onionize
 
 Usage
 -----
-To onionize a [directory|file|zip archive]:
+To onionize a thing pass the path to it:
 
 ```
-$ onionize [||-zip] /path/to/my/[directory|file|archive.zip]
+$ onionize /path/to/thing
 ```
+
+or the URL:
+
+```
+$ onionize https://example.com/
+```
+Pass `-zip` flag to serve from the zip archive.
 
 Grab the onion link from `stdout` and errors/info from `stderr`.
  

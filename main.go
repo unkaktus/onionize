@@ -41,7 +41,7 @@ func main() {
 		guiMain(paramsCh, linkCh)
 	} else {
 		if len(flag.Args()) != 1 {
-			log.Fatalf("You should specify exactly one path")
+			log.Fatalf("You should specify exactly one path/target URL")
 		}
 		p := libonionize.Parameters{
 			Debug:           debug,
