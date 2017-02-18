@@ -40,19 +40,6 @@ type Parameters struct {
 	Debug           bool
 }
 
-func ResetHTTPConn(w *http.ResponseWriter) error {
-	hj, ok := (*w).(http.Hijacker)
-	if !ok {
-		return fmt.Errorf("This webserver doesn't support hijacking")
-	}
-	conn, _, err := hj.Hijack()
-	if err != nil {
-		return err
-	}
-	conn.Close()
-	return nil
-}
-
 func CheckAndRewriteSlug(req *http.Request, slug string) error {
 	if slug == "" {
 		return nil
@@ -144,14 +131,12 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 				if p.Debug {
 					log.Print(err)
 				}
-				err := ResetHTTPConn(&w)
-				if err != nil {
-					log.Printf("Unable to reset connection: %v", err)
-				}
+				http.NotFound(w, req)
 				return
 			}
 			if req.URL.String() == "" { // empty root path
 				http.Redirect(w, req, "/"+slug+"/", http.StatusFound)
+				return
 			}
 			if p.Debug {
 				log.Printf("Rewriting URL to \"%s\"", req.URL)
