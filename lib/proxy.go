@@ -19,7 +19,6 @@ func OnionReverseHTTPProxy(target *url.URL) *httputil.ReverseProxy {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
 		req.Host = target.Host
-		req.URL.Path = target.Path
 		req.Header.Set("User-Agent", "onionize")
 		log.Printf("%v", req.URL)
 	}

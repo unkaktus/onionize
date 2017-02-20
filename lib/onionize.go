@@ -1,4 +1,4 @@
-// onionize.go - onionize directories, files and zips.
+// onionize.go - onionize things.
 //
 // To the extent possible under law, Ivan Markin waived all copyright
 // and related or neighboring rights to this module of onionize, using the creative
@@ -30,18 +30,12 @@ type Parameters struct {
 	Debug           bool
 }
 
-type ResultLink struct {
-	URL   string
-	Error error
-}
-
-func Onionize(p Parameters, linkCh chan<- ResultLink) {
+func Onionize(p Parameters, linkChan chan<- string) error {
 	var handler http.Handler
 	var link string
 	target, err := url.Parse(p.Path)
 	if err != nil {
-		linkCh <- ResultLink{Error: fmt.Errorf("Unable to parse target URL: %v", err)}
-		return
+		return fmt.Errorf("Unable to parse target URL: %v", err)
 	}
 	switch target.Scheme {
 	case "http", "https":
@@ -49,8 +43,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	default:
 		handler, link, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
 		if err != nil {
-			linkCh <- ResultLink{Error: err}
-			return
+			return err
 		}
 	}
 	server := &http.Server{Handler: handler}
@@ -61,8 +54,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	}
 	c, err := bulb.DialURL(p.ControlPath)
 	if err != nil {
-		linkCh <- ResultLink{Error: fmt.Errorf("Failed to connect to control socket: %v", err)}
-		return
+		return fmt.Errorf("Failed to connect to control socket: %v", err)
 	}
 	defer c.Close()
 
@@ -71,8 +63,7 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 
 	// Authenticate with the control port
 	if err := c.Authenticate(p.ControlPassword); err != nil {
-		linkCh <- ResultLink{Error: fmt.Errorf("Authentication failed: %v", err)}
-		return
+		return fmt.Errorf("Authentication failed: %v", err)
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
 	aocfg := &bulb.NewOnionConfig{
@@ -82,23 +73,21 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	if p.Passphrase != "" {
 		keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
 		if err != nil {
-			linkCh <- ResultLink{Error: fmt.Errorf("Unable to create keystream: %v", err)}
-			return
+			return fmt.Errorf("Unable to create keystream: %v", err)
 		}
 		privOnionKey, err := onionutil.GenerateOnionKey(keyrd, "current")
 		if err != nil {
-			linkCh <- ResultLink{Error: fmt.Errorf("Unable to generate onion key: %v", err)}
-			return
+			return fmt.Errorf("Unable to generate onion key: %v", err)
 		}
 		aocfg.PrivateKey = privOnionKey
 	}
 	onionListener, err := c.NewListener(aocfg, 80)
 	if err != nil {
-		linkCh <- ResultLink{Error: fmt.Errorf("Error occured while creating an onion service: %v", err)}
-		return
+		return fmt.Errorf("Error occured while creating an onion service: %v", err)
 	}
 	defer onionListener.Close()
 	// Track if tor went down
+	// TODO: Signal from here to perform graceful shutdown and display a message
 	go func() {
 		for {
 			_, err := c.NextEvent()
@@ -110,10 +99,11 @@ func Onionize(p Parameters, linkCh chan<- ResultLink) {
 	onionHost := strings.TrimSuffix(onionListener.Addr().String(), ":80")
 
 	// Return the link to the service
-	linkCh <- ResultLink{URL: fmt.Sprintf("http://%s/%s", onionHost, link)}
+	linkChan <- fmt.Sprintf("http://%s/%s", onionHost, link)
 	// Run a webservice
 	err = server.Serve(onionListener)
 	if err != nil {
-		log.Fatalf("Cannot serve HTTP")
+		return fmt.Errorf("Cannot serve HTTP: %v", err)
 	}
+	return nil
 }

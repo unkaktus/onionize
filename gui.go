@@ -21,7 +21,7 @@ const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain(paramsCh chan<- libonionize.Parameters, linkCh <-chan libonionize.ResultLink) {
+func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan string, errChan <-chan error) {
 	gtk.Init(nil)
 
 	var err error
@@ -171,24 +171,25 @@ func guiMain(paramsCh chan<- libonionize.Parameters, linkCh <-chan libonionize.R
 	}
 	urlEntry.SetHExpand(true)
 	go func() {
-		for link := range linkCh {
-			if link.Error != nil {
-				errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, link.Error.Error())
+		for {
+			select {
+			case link := <-linkChan:
 				_, err = glib.IdleAdd(func() {
-					errDialog.Run()
-					errDialog.Destroy()
-					fadeIn()
+					urlEntry.SetText(link)
+					doBtn.Destroy()
+					grid.Attach(urlEntry, 0, 2, 2, 1)
+					urlEntry.SelectRegion(0, len(link))
+					grid.ShowAll()
 				})
 				if err != nil {
 					log.Fatal(err)
 				}
-			} else {
+			case err := <-errChan:
+				errDialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, err.Error())
 				_, err = glib.IdleAdd(func() {
-					urlEntry.SetText(link.URL)
-					doBtn.Destroy()
-					grid.Attach(urlEntry, 0, 2, 2, 1)
-					urlEntry.SelectRegion(0, len(link.URL))
-					grid.ShowAll()
+					errDialog.Run()
+					errDialog.Destroy()
+					fadeIn()
 				})
 				if err != nil {
 					log.Fatal(err)

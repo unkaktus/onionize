@@ -29,16 +29,18 @@ func main() {
 
 	debug = *debugFlag
 	paramsCh := make(chan libonionize.Parameters)
-	linkCh := make(chan libonionize.ResultLink)
+	linkChan := make(chan string)
+	errChan := make(chan error)
 
 	go func() {
-		for p := range paramsCh {
-			go libonionize.Onionize(p, linkCh)
-		}
+		p := <-paramsCh
+		go func() {
+			errChan <- libonionize.Onionize(p, linkChan)
+		}()
 	}()
 
 	if len(flag.Args()) == 0 {
-		guiMain(paramsCh, linkCh)
+		guiMain(paramsCh, linkChan, errChan)
 	} else {
 		if len(flag.Args()) != 1 {
 			log.Fatalf("You should specify exactly one path/target URL")
@@ -61,11 +63,14 @@ func main() {
 			p.Passphrase = string(onionPassphrase)
 		}
 		paramsCh <- p
-		for link := range linkCh {
-			if link.Error != nil {
-				log.Fatal(link.Error)
+
+		for {
+			select {
+			case link := <-linkChan:
+				fmt.Println(link)
+			case err := <-errChan:
+				log.Fatal(err)
 			}
-			fmt.Println(link.URL)
 		}
 	}
 }
