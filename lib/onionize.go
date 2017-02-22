@@ -40,11 +40,13 @@ func Onionize(p Parameters, linkChan chan<- string) error {
 	switch target.Scheme {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
-	default:
+	case "":
 		handler, link, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
+	default:
+		return fmt.Errorf("Unsupported target type: %s", target.Scheme)
 	}
 	server := &http.Server{Handler: handler}
 
