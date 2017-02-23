@@ -32,7 +32,9 @@ type Parameters struct {
 
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
-	var link string
+	link := url.URL{
+		Scheme: "http",
+	}
 	target, err := url.Parse(p.Path)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
@@ -41,7 +43,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
 	case "":
-		handler, link, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
+		handler, link.Path, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
@@ -111,14 +113,10 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		}
 	}()
 
-	onionURL := url.URL{
-		Scheme:	"http",
-		Host: fmt.Sprintf("%s.onion", oi.OnionID),
-		Path: link,
-	}
+	link.Host = fmt.Sprintf("%s.onion", oi.OnionID)
 
 	// Return the link to the service
-	linkChan <- onionURL
+	linkChan <- link
 	// Run a webservice
 	err = server.Serve(listener)
 	if err != nil {
