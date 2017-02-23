@@ -10,10 +10,11 @@ package main
 
 import (
 	"log"
+	"net/url"
 
 	libonionize "github.com/nogoegst/onionize/lib"
 )
 
-func guiMain(chan libonionize.Parameters, chan string, chan error) {
+func guiMain(chan libonionize.Parameters, chan url.URL, chan error) {
 	log.Fatal("Please specify path to target")
 }

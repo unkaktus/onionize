@@ -10,6 +10,7 @@ package main
 
 import (
 	"log"
+	"net/url"
 	"os"
 
 	"github.com/gotk3/gotk3/glib"
@@ -21,7 +22,7 @@ const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan string, errChan <-chan error) {
+func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan url.URL, errChan <-chan error) {
 	gtk.Init(nil)
 
 	var err error
@@ -175,10 +176,11 @@ func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan string, err
 			select {
 			case link := <-linkChan:
 				_, err = glib.IdleAdd(func() {
-					urlEntry.SetText(link)
+					linkString := link.String()
+					urlEntry.SetText(linkString)
 					doBtn.Destroy()
 					grid.Attach(urlEntry, 0, 2, 2, 1)
-					urlEntry.SelectRegion(0, len(link))
+					urlEntry.SelectRegion(0, len(linkString))
 					grid.ShowAll()
 				})
 				if err != nil {

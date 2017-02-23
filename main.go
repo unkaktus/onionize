@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 
 	libonionize "github.com/nogoegst/onionize/lib"
@@ -29,7 +30,7 @@ func main() {
 
 	debug = *debugFlag
 	paramsCh := make(chan libonionize.Parameters)
-	linkChan := make(chan string)
+	linkChan := make(chan url.URL)
 	errChan := make(chan error)
 
 	go func() {
@@ -67,7 +68,8 @@ func main() {
 		for {
 			select {
 			case link := <-linkChan:
-				fmt.Println(link)
+				linkString := link.String()
+				fmt.Println(linkString)
 			case err := <-errChan:
 				log.Fatal(err)
 			}

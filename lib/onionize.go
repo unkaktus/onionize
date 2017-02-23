@@ -31,7 +31,7 @@ type Parameters struct {
 	Debug           bool
 }
 
-func Onionize(p Parameters, linkChan chan<- string) error {
+func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
 	var link string
 	target, err := url.Parse(p.Path)
@@ -121,12 +121,12 @@ func Onionize(p Parameters, linkChan chan<- string) error {
 
 	onionURL := url.URL{
 		Scheme:	"http",
-		Host: oi.OnionID,
+		Host: fmt.Sprintf("%s.onion", oi.OnionID),
 		Path: link,
 	}
 
 	// Return the link to the service
-	linkChan <- onionURL.String()
+	linkChan <- onionURL
 	// Run a webservice
 	err = server.Serve(tcpListener)
 	if err != nil {
