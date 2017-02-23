@@ -9,6 +9,7 @@ import (
 	"os"
 
 	libonionize "github.com/nogoegst/onionize/lib"
+	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
 )
 
@@ -27,6 +28,8 @@ func main() {
 		"Set Tor control address to be used")
 	var controlPasswd = flag.String("control-passwd", "",
 		"Set Tor control auth password")
+	var idKeyPath = flag.String("id-key", "",
+		"Path to onion identity private key")
 	var tlsCertPath = flag.String("tls-cert", "",
 		"Path to TLS certificate")
 	var tlsKeyPath = flag.String("tls-key", "",
@@ -81,7 +84,14 @@ func main() {
 			}
 			fmt.Printf("\n")
 			p.Passphrase = string(onionPassphrase)
+		} else if *idKeyPath != "" {
+			var err error
+			p.IdentityKey, err = onionutil.LoadPrivateKeyFile(*idKeyPath)
+			if err != nil {
+				log.Fatalf("Unable to load identity private key: %v", err)
+			}
 		}
+
 		paramsCh <- p
 
 		for {

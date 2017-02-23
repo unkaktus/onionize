@@ -8,6 +8,7 @@
 package onionize
 
 import (
+	"crypto"
 	"crypto/tls"
 	"fmt"
 	"log"
@@ -29,6 +30,7 @@ type Parameters struct {
 	ControlPassword string
 	Passphrase      string
 	Debug           bool
+	IdentityKey     crypto.PrivateKey
 	TLSConfig       *tls.Config
 }
 
@@ -84,6 +86,8 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 			return fmt.Errorf("Unable to generate onion key: %v", err)
 		}
 		nocfg.PrivateKey = privOnionKey
+	} else {
+		nocfg.PrivateKey = p.IdentityKey
 	}
 
 	var listener net.Listener
