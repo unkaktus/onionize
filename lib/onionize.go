@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strconv"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
@@ -84,24 +83,17 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		}
 		nocfg.PrivateKey = privOnionKey
 	}
-	const loopbackAddr = "127.0.0.1:0"
 
-	// Listen on the loopback interface.
-	tcpListener, err := net.Listen("tcp4", loopbackAddr)
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
 	if err != nil {
 		return err
 	}
-	tAddr, ok := tcpListener.Addr().(*net.TCPAddr)
-	if !ok {
-		tcpListener.Close()
-		return fmt.Errorf("Failed to extract local port")
-	}
 
 	virtPort := uint16(80)
-	targetPortStr := strconv.FormatUint((uint64)(tAddr.Port), 10)
+
 	portSpec := bulb.OnionPortSpec{
 		VirtPort: virtPort,
-		Target:   targetPortStr,
+		Target:   listener.Addr().String(),
 	}
 	nocfg.PortSpecs = []bulb.OnionPortSpec{portSpec}
 	oi, err := c.NewOnion(nocfg)
@@ -128,7 +120,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	// Return the link to the service
 	linkChan <- onionURL
 	// Run a webservice
-	err = server.Serve(tcpListener)
+	err = server.Serve(listener)
 	if err != nil {
 		return fmt.Errorf("Cannot serve HTTP: %v", err)
 	}
