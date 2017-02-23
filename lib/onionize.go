@@ -8,6 +8,7 @@
 package onionize
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -28,13 +29,12 @@ type Parameters struct {
 	ControlPassword string
 	Passphrase      string
 	Debug           bool
+	TLSConfig       *tls.Config
 }
 
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
-	link := url.URL{
-		Scheme: "http",
-	}
+	var link url.URL
 	target, err := url.Parse(p.Path)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
@@ -86,12 +86,22 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		nocfg.PrivateKey = privOnionKey
 	}
 
-	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	var listener net.Listener
+	rawListener, err := net.Listen("tcp4", "127.0.0.1:0")
 	if err != nil {
 		return err
 	}
 
-	virtPort := uint16(80)
+	var virtPort uint16
+	if p.TLSConfig != nil {
+		listener = tls.NewListener(rawListener, p.TLSConfig)
+		link.Scheme = "https"
+		virtPort = uint16(443)
+	} else {
+		listener = rawListener
+		link.Scheme = "http"
+		virtPort = uint16(80)
+	}
 
 	portSpec := bulb.OnionPortSpec{
 		VirtPort: virtPort,

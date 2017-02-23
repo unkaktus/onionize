@@ -58,3 +58,13 @@ will be derived. Thus you can preserve same .onion address across setups.
 
 Identity passphrase can be specified on `stdin` by setting `-p` flag in CLI
 or in corresponding field in GUI.
+
+TLS
+---
+Yeah, tee-el-es... Specifying paths to X.509 key and certificate:
+
+```
+./onionize -tls-cert server.crt -tls-key server.key /path/to/the-thing
+```
+produces `https` onion site. `*_WITH_CHACHA20_POLY1305` are the only
+enabled cipher suites.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -26,6 +27,10 @@ func main() {
 		"Set Tor control address to be used")
 	var controlPasswd = flag.String("control-passwd", "",
 		"Set Tor control auth password")
+	var tlsCertPath = flag.String("tls-cert", "",
+		"Path to TLS certificate")
+	var tlsKeyPath = flag.String("tls-key", "",
+		"Path tp TLS private key")
 	flag.Parse()
 
 	debug = *debugFlag
@@ -53,6 +58,20 @@ func main() {
 			Path:            flag.Args()[0],
 			Slug:            !*noslugFlag,
 			Zip:             *zipFlag,
+		}
+		if *tlsCertPath != "" && *tlsKeyPath != "" {
+			var err error
+			p.TLSConfig = &tls.Config{
+				CipherSuites: []uint16{
+					tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+					tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+				},
+				Certificates: make([]tls.Certificate, 1),
+			}
+			p.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(*tlsCertPath, *tlsKeyPath)
+			if err != nil {
+				log.Fatalf("Unable to load TLS keypair: %v", err)
+			}
 		}
 		if *passphraseFlag {
 			fmt.Fprintf(os.Stderr, "Enter your passphrase for onion identity: ")
