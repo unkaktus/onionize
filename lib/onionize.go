@@ -10,9 +10,10 @@ package onionize
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
-	"strings"
+	"strconv"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/onionutil"
@@ -68,7 +69,7 @@ func Onionize(p Parameters, linkChan chan<- string) error {
 		return fmt.Errorf("Authentication failed: %v", err)
 	}
 	// Derive onion service keymaterial from passphrase or generate a new one
-	aocfg := &bulb.NewOnionConfig{
+	nocfg := &bulb.NewOnionConfig{
 		DiscardPK:      true,
 		AwaitForUpload: true,
 	}
@@ -81,13 +82,32 @@ func Onionize(p Parameters, linkChan chan<- string) error {
 		if err != nil {
 			return fmt.Errorf("Unable to generate onion key: %v", err)
 		}
-		aocfg.PrivateKey = privOnionKey
+		nocfg.PrivateKey = privOnionKey
 	}
-	onionListener, err := c.NewListener(aocfg, 80)
+	const loopbackAddr = "127.0.0.1:0"
+
+	// Listen on the loopback interface.
+	tcpListener, err := net.Listen("tcp4", loopbackAddr)
+	if err != nil {
+		return err
+	}
+	tAddr, ok := tcpListener.Addr().(*net.TCPAddr)
+	if !ok {
+		tcpListener.Close()
+		return fmt.Errorf("Failed to extract local port")
+	}
+
+	virtPort := uint16(80)
+	targetPortStr := strconv.FormatUint((uint64)(tAddr.Port), 10)
+	portSpec := bulb.OnionPortSpec{
+		VirtPort: virtPort,
+		Target:   targetPortStr,
+	}
+	nocfg.PortSpecs = []bulb.OnionPortSpec{portSpec}
+	oi, err := c.NewOnion(nocfg)
 	if err != nil {
 		return fmt.Errorf("Error occured while creating an onion service: %v", err)
 	}
-	defer onionListener.Close()
 	// Track if tor went down
 	// TODO: Signal from here to perform graceful shutdown and display a message
 	go func() {
@@ -98,12 +118,17 @@ func Onionize(p Parameters, linkChan chan<- string) error {
 			}
 		}
 	}()
-	onionHost := strings.TrimSuffix(onionListener.Addr().String(), ":80")
+
+	onionURL := url.URL{
+		Scheme:	"http",
+		Host: oi.OnionID,
+		Path: link,
+	}
 
 	// Return the link to the service
-	linkChan <- fmt.Sprintf("http://%s/%s", onionHost, link)
+	linkChan <- onionURL.String()
 	// Run a webservice
-	err = server.Serve(onionListener)
+	err = server.Serve(tcpListener)
 	if err != nil {
 		return fmt.Errorf("Cannot serve HTTP: %v", err)
 	}
