@@ -9,6 +9,7 @@ import (
 	"os"
 
 	libonionize "github.com/nogoegst/onionize/lib"
+	"github.com/mdp/qrterminal"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
 )
@@ -22,6 +23,8 @@ func main() {
 		"Do not use slugs")
 	var zipFlag = flag.Bool("zip", false,
 		"Serve zip file contents")
+	var qrFlag = flag.Bool("qr", false,
+		"Print link in QR code to stdout")
 	var passphraseFlag = flag.Bool("p", false,
 		"Ask for passphrase to generate onion key")
 	var control = flag.String("control-addr", "default://",
@@ -98,7 +101,11 @@ func main() {
 			select {
 			case link := <-linkChan:
 				linkString := link.String()
+				if *qrFlag {
+					qrterminal.Generate(linkString, qrterminal.L, os.Stdout)
+				}
 				fmt.Println(linkString)
+
 			case err := <-errChan:
 				log.Fatal(err)
 			}
