@@ -86,7 +86,7 @@ func main() {
 			p.Passphrase = string(onionPassphrase)
 		} else if *idKeyPath != "" {
 			var err error
-			p.IdentityKey, err = onionutil.LoadPrivateKeyFile(*idKeyPath)
+			p.IdentityKey, _, err = onionutil.LoadPrivateKeyFile(*idKeyPath)
 			if err != nil {
 				log.Fatalf("Unable to load identity private key: %v", err)
 			}
