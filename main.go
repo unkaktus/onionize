@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"os"
 
-	libonionize "github.com/nogoegst/onionize/lib"
 	"github.com/mdp/qrterminal"
+	libonionize "github.com/nogoegst/onionize/lib"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
 )

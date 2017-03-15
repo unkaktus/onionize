@@ -13,8 +13,10 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/mdp/rsc/qr"
 	libonionize "github.com/nogoegst/onionize/lib"
 )
 
@@ -181,6 +183,28 @@ func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan url.URL, er
 					doBtn.Destroy()
 					grid.Attach(urlEntry, 0, 2, 2, 1)
 					urlEntry.SelectRegion(0, len(linkString))
+
+					qrcode, err := qr.Encode(linkString, qr.L)
+					if err != nil {
+						log.Fatal(err)
+					}
+					pbl, err := gdk.PixbufLoaderNewWithType("png")
+					if err != nil {
+						log.Fatalf("Failed to create a pixbuf: %v", err)
+					}
+					_, err = pbl.Write(qrcode.PNG())
+					if err != nil {
+						log.Fatalf("Failed to write to pixbuf: %v", err)
+					}
+					qrPixbuf, err := pbl.GetPixbuf()
+					if err != nil {
+						log.Fatalf("Failed to get pixbuf: %v", err)
+					}
+					qrCodeWidget, err := gtk.ImageNewFromPixbuf(qrPixbuf)
+					if err != nil {
+						log.Fatalf("Failed to create qrcode widget: %v", err)
+					}
+					grid.Attach(qrCodeWidget, 0, 3, 2, 1)
 					grid.ShowAll()
 				})
 				if err != nil {
