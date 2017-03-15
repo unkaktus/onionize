@@ -76,13 +76,11 @@ func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, l
 			if err != nil {
 				return nil, "", fmt.Errorf("Unable to get absolute path to file")
 			}
-			dir, file := filepath.Split(abspath)
+			dir, filename := filepath.Split(abspath)
 			m := make(map[string]string)
-			m[file] = file
+			m[filename] = filename
 			fs = pickfs.New(vfs.OS(dir), m)
-			// Escape URL to be safe and copypasteble
-			escapedFilename := strings.Replace(url.QueryEscape(file), "+", "%20", -1)
-			link += escapedFilename
+			link += filename
 		}
 	}
 	// Serve our virtual filesystem
