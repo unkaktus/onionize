@@ -16,7 +16,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/mdp/rsc/qr"
+	"github.com/rsc/qr"
 	libonionize "github.com/nogoegst/onionize/lib"
 )
 
