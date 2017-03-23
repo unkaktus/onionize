@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,29 +25,30 @@ import (
 	"golang.org/x/tools/godoc/vfs/zipfs"
 )
 
-func checkAndRewriteSlug(req *http.Request, slug string) error {
+func checkSlug(req *http.Request, slug string) error {
 	if slug == "" {
 		return nil
 	}
-	reqURL := strings.TrimLeft(req.URL.String(), "/")
-	if len(reqURL) < len(slug) {
-		return fmt.Errorf("URL is too short to have a slug in it")
+	shost := strings.Split(req.Host, ".")
+	if len(shost) != 3 {
+		return fmt.Errorf("Wrong hostname to have a slug")
 	}
-	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(reqURL[:len(slug)])) {
+	if len(shost[0]) < slugLength {
+		return fmt.Errorf("Subdomain is too short to have a slug in it")
+	}
+	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(shost[0][:len(slug)])) {
 		return fmt.Errorf("Wrong slug")
 	}
-	reqURL = strings.TrimPrefix(reqURL, slug)
-	req.URL, _ = url.Parse(reqURL)
 	return nil
 }
 
 func generateSlug() (string, error) {
-	slugBin := make([]byte, (slugLengthB32*5)/8+1)
+	slugBin := make([]byte, (slugLength*5)/8+1)
 	_, err := rand.Read(slugBin)
 	if err != nil {
 		return "", err
 	}
-	return onionutil.Base32Encode(slugBin)[:slugLengthB32], nil
+	return onionutil.Base32Encode(slugBin)[:slugLength], nil
 }
 
 func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, slug string, err error) {
@@ -97,20 +97,18 @@ func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, s
 		if debug {
 			log.Printf("Request for \"%s\"", req.URL)
 		}
-		err := checkAndRewriteSlug(req, slug)
+		err := checkSlug(req, slug)
 		if err != nil {
+			http.NotFound(w, req)
 			if debug {
 				log.Print(err)
 			}
-			http.NotFound(w, req)
 			return
 		}
-		if req.URL.String() == "" { // empty root path
-			http.Redirect(w, req, "/"+slug+"/"+filename, http.StatusFound)
+		// Redirect roots to the file itself
+		if req.URL.String() == "/" && filename != "" {
+			http.Redirect(w, req, "/"+filename, http.StatusFound)
 			return
-		}
-		if debug {
-			log.Printf("Rewriting URL to \"%s\"", req.URL)
 		}
 		fileserver.ServeHTTP(w, req)
 	})

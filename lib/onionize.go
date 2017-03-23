@@ -20,7 +20,7 @@ import (
 	"github.com/nogoegst/onionutil"
 )
 
-const slugLengthB32 = 16
+const slugLength = 16
 
 type Parameters struct {
 	Path            string
@@ -37,6 +37,7 @@ type Parameters struct {
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
 	var link url.URL
+	var slug string
 	target, err := url.Parse(p.Path)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
@@ -45,7 +46,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
 	case "":
-		handler, link.Path, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
+		handler, slug, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
@@ -127,7 +128,11 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		}
 	}()
 
-	link.Host = fmt.Sprintf("%s.onion", oi.OnionID)
+	if slug != "" {
+		link.Host = fmt.Sprintf("%s.%s.onion", slug, oi.OnionID)
+	} else {
+		link.Host = fmt.Sprintf("%s.onion", oi.OnionID)
+	}
 
 	// Return the link to the service
 	linkChan <- link
