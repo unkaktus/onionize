@@ -42,17 +42,24 @@ func checkAndRewriteSlug(req *http.Request, slug string) error {
 	return nil
 }
 
-func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, link string, err error) {
+func generateSlug() (string, error) {
+	slugBin := make([]byte, (slugLengthB32*5)/8+1)
+	_, err := rand.Read(slugBin)
+	if err != nil {
+		return "", err
+	}
+	return onionutil.Base32Encode(slugBin)[:slugLengthB32], nil
+}
+
+func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, slug string, err error) {
 	var fs vfs.FileSystem
-	var slug string
+	var filename string
+
 	if slugOn {
-		slugBin := make([]byte, (slugLengthB32*5)/8+1)
-		_, err := rand.Read(slugBin)
+		slug, err = generateSlug()
 		if err != nil {
 			return nil, "", fmt.Errorf("Unable to generate slug: %v", err)
 		}
-		slug = onionutil.Base32Encode(slugBin)[:slugLengthB32]
-		link = slug + "/"
 	}
 
 	if zipOn {
@@ -71,16 +78,16 @@ func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, l
 			// Serve a plain directory
 			fs = vfs.OS(path)
 		} else {
-			// Serve just one file in OnionShare-like manner
+			// Serve just one file
 			abspath, err := filepath.Abs(path)
 			if err != nil {
 				return nil, "", fmt.Errorf("Unable to get absolute path to file")
 			}
-			dir, filename := filepath.Split(abspath)
+			var dir string
+			dir, filename = filepath.Split(abspath)
 			m := make(map[string]string)
 			m[filename] = filename
 			fs = pickfs.New(vfs.OS(dir), m)
-			link += filename
 		}
 	}
 	// Serve our virtual filesystem
@@ -99,7 +106,7 @@ func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, l
 			return
 		}
 		if req.URL.String() == "" { // empty root path
-			http.Redirect(w, req, "/"+slug+"/", http.StatusFound)
+			http.Redirect(w, req, "/"+slug+"/"+filename, http.StatusFound)
 			return
 		}
 		if debug {
@@ -107,5 +114,5 @@ func FileServer(path string, slugOn, zipOn, debug bool) (handler http.Handler, l
 		}
 		fileserver.ServeHTTP(w, req)
 	})
-	return mux, link, nil
+	return mux, slug, nil
 }
