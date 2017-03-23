@@ -36,8 +36,8 @@ type Parameters struct {
 
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
-	var link url.URL
 	var slug string
+	link := url.URL{Path: "/"}
 	target, err := url.Parse(p.Path)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
