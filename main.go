@@ -45,10 +45,9 @@ func main() {
 	errChan := make(chan error)
 
 	go func() {
-		p := <-paramsCh
-		go func() {
+		for p := range paramsCh {
 			errChan <- libonionize.Onionize(p, linkChan)
-		}()
+		}
 	}()
 
 	if len(flag.Args()) == 0 {
