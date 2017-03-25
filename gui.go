@@ -16,8 +16,8 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rsc/qr"
 	libonionize "github.com/nogoegst/onionize/lib"
+	"rsc.io/qr"
 )
 
 const applicationTitle = "onionize"

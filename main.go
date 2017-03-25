@@ -8,10 +8,11 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/mdp/qrterminal"
+	"github.com/nogoegst/byteqr"
 	libonionize "github.com/nogoegst/onionize/lib"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
+	"rsc.io/qr"
 )
 
 var debug bool
@@ -102,7 +103,7 @@ func main() {
 			case link := <-linkChan:
 				linkString := link.String()
 				if *qrFlag {
-					qrterminal.Generate(linkString, qrterminal.L, os.Stdout)
+					byteqr.Write(os.Stdout, linkString, qr.L, nil, nil)
 				}
 				fmt.Println(linkString)
 
