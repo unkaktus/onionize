@@ -32,12 +32,24 @@ type Parameters struct {
 	Debug           bool
 	IdentityKey     crypto.PrivateKey
 	TLSConfig       *tls.Config
+	NoOnion         bool
 }
 
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
 	var slug string
+	useSlug := p.Slug
+	if p.NoOnion {
+		useSlug = false
+	}
+	useOnion := !p.NoOnion
 	link := url.URL{Path: "/"}
+	var c *bulb.Conn
+	nocfg := &bulb.NewOnionConfig{
+		DiscardPK:      true,
+		AwaitForUpload: true,
+	}
+
 	target, err := url.Parse(p.Path)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
@@ -46,7 +58,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
 	case "":
-		handler, slug, err = FileServer(p.Path, p.Slug, p.Zip, p.Debug)
+		handler, slug, err = FileServer(p.Path, useSlug, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
@@ -55,44 +67,54 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	}
 	server := &http.Server{Handler: handler}
 
-	// Connect to a running tor instance
-	if p.ControlPath == "" {
-		p.ControlPath = "default://"
-	}
-	c, err := bulb.DialURL(p.ControlPath)
-	if err != nil {
-		return fmt.Errorf("Failed to connect to control socket: %v", err)
-	}
-	defer c.Close()
-
-	// See what's really going on under the hood
-	c.Debug(p.Debug)
-
-	// Authenticate with the control port
-	if err := c.Authenticate(p.ControlPassword); err != nil {
-		return fmt.Errorf("Authentication failed: %v", err)
-	}
-	// Derive onion service keymaterial from passphrase or generate a new one
-	nocfg := &bulb.NewOnionConfig{
-		DiscardPK:      true,
-		AwaitForUpload: true,
-	}
-	if p.Passphrase != "" {
-		keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
-		if err != nil {
-			return fmt.Errorf("Unable to create keystream: %v", err)
+	listenAddress := "127.0.0.1:0"
+	if useOnion {
+		// Connect to a running tor instance
+		if p.ControlPath == "" {
+			p.ControlPath = "default://"
 		}
-		privOnionKey, err := onionutil.GenerateOnionKey(keyrd, "current")
+		c, err = bulb.DialURL(p.ControlPath)
 		if err != nil {
-			return fmt.Errorf("Unable to generate onion key: %v", err)
+			return fmt.Errorf("Failed to connect to control socket: %v", err)
 		}
-		nocfg.PrivateKey = privOnionKey
+		defer c.Close()
+
+		// See what's really going on under the hood
+		c.Debug(p.Debug)
+
+		// Authenticate with the control port
+		if err := c.Authenticate(p.ControlPassword); err != nil {
+			return fmt.Errorf("Authentication failed: %v", err)
+		}
+		// Derive onion service keymaterial from passphrase or generate a new one
+		if p.Passphrase != "" {
+			keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
+			if err != nil {
+				return fmt.Errorf("Unable to create keystream: %v", err)
+			}
+			privOnionKey, err := onionutil.GenerateOnionKey(keyrd, "current")
+			if err != nil {
+				return fmt.Errorf("Unable to generate onion key: %v", err)
+			}
+			nocfg.PrivateKey = privOnionKey
+		} else {
+			nocfg.PrivateKey = p.IdentityKey
+		}
 	} else {
-		nocfg.PrivateKey = p.IdentityKey
+		tc, err := net.Dial("udp", "1.1.1.1:1")
+		if err != nil {
+			return err
+		}
+		defer tc.Close()
+		host, _, err := net.SplitHostPort(tc.LocalAddr().String())
+		if err != nil {
+			return err
+		}
+		listenAddress = host + ":0"
 	}
 
 	var listener net.Listener
-	rawListener, err := net.Listen("tcp4", "127.0.0.1:0")
+	rawListener, err := net.Listen("tcp4", listenAddress)
 	if err != nil {
 		return err
 	}
@@ -108,30 +130,34 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		virtPort = uint16(80)
 	}
 
-	portSpec := bulb.OnionPortSpec{
-		VirtPort: virtPort,
-		Target:   listener.Addr().String(),
-	}
-	nocfg.PortSpecs = []bulb.OnionPortSpec{portSpec}
-	oi, err := c.NewOnion(nocfg)
-	if err != nil {
-		return fmt.Errorf("Error occured while creating an onion service: %v", err)
-	}
-	// Track if tor went down
-	// TODO: Signal from here to perform graceful shutdown and display a message
-	go func() {
-		for {
-			_, err := c.NextEvent()
-			if err != nil {
-				log.Fatalf("Lost connection to tor: %v", err)
-			}
+	if useOnion {
+		portSpec := bulb.OnionPortSpec{
+			VirtPort: virtPort,
+			Target:   listener.Addr().String(),
 		}
-	}()
+		nocfg.PortSpecs = []bulb.OnionPortSpec{portSpec}
+		oi, err := c.NewOnion(nocfg)
+		if err != nil {
+			return fmt.Errorf("Error occured while creating an onion service: %v", err)
+		}
+		// Track if tor went down
+		// TODO: Signal from here to perform graceful shutdown and display a message
+		go func() {
+			for {
+				_, err := c.NextEvent()
+				if err != nil {
+					log.Fatalf("Lost connection to tor: %v", err)
+				}
+			}
+		}()
 
-	if slug != "" {
-		link.Host = fmt.Sprintf("%s.%s.onion", slug, oi.OnionID)
+		if slug != "" {
+			link.Host = fmt.Sprintf("%s.%s.onion", slug, oi.OnionID)
+		} else {
+			link.Host = fmt.Sprintf("%s.onion", oi.OnionID)
+		}
 	} else {
-		link.Host = fmt.Sprintf("%s.onion", oi.OnionID)
+		link.Host = listener.Addr().String()
 	}
 
 	// Return the link to the service

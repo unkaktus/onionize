@@ -26,6 +26,8 @@ func main() {
 		"Serve zip file contents")
 	var qrFlag = flag.Bool("qr", false,
 		"Print link in QR code to stdout")
+	var noOnionFlag = flag.Bool("noonion", false,
+		"Run in outside-reachable mode without onion service")
 	var passphraseFlag = flag.Bool("p", false,
 		"Ask for passphrase to generate onion key")
 	var control = flag.String("control-addr", "default://",
@@ -65,6 +67,7 @@ func main() {
 			Path:            flag.Args()[0],
 			Slug:            !*noslugFlag,
 			Zip:             *zipFlag,
+			NoOnion:         *noOnionFlag,
 		}
 		if *tlsCertPath != "" && *tlsKeyPath != "" {
 			var err error
