@@ -72,10 +72,12 @@ func main() {
 		if *tlsCertPath != "" && *tlsKeyPath != "" {
 			var err error
 			p.TLSConfig = &tls.Config{
+				/*
 				CipherSuites: []uint16{
 					tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 					tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 				},
+				*/
 				Certificates: make([]tls.Certificate, 1),
 			}
 			p.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(*tlsCertPath, *tlsKeyPath)
