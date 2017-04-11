@@ -10,14 +10,12 @@ package onionize
 import (
 	"crypto"
 	"crypto/rand"
-	"crypto/subtle"
 	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/fileserver"
@@ -37,23 +35,6 @@ type Parameters struct {
 	IdentityKey     crypto.PrivateKey
 	TLSConfig       *tls.Config
 	NoOnion         bool
-}
-
-func checkSlug(req *http.Request, slug string) error {
-	if slug == "" {
-		return nil
-	}
-	shost := strings.Split(req.Host, ".")
-	if len(shost) != 3 {
-		return fmt.Errorf("Wrong hostname to have a slug")
-	}
-	if len(shost[0]) < slugLength {
-		return fmt.Errorf("Subdomain is too short to have a slug in it")
-	}
-	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(shost[0][:len(slug)])) {
-		return fmt.Errorf("Wrong slug")
-	}
-	return nil
 }
 
 func generateSlug() (string, error) {
@@ -99,19 +80,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	default:
 		return fmt.Errorf("Unsupported target type: %s", target.Scheme)
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		err := checkSlug(req, slug)
-		if err != nil {
-			http.NotFound(w, req)
-			if p.Debug {
-				log.Print(err)
-			}
-			return
-		}
-		handler.ServeHTTP(w, req)
-	})
-	server := &http.Server{Handler: mux}
+	server := &http.Server{Handler: SubdomainSluggedHandler(handler, slug)}
 
 	listenAddress := "127.0.0.1:0"
 	if useOnion {
