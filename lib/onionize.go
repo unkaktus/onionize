@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/nogoegst/bulb"
+	"github.com/nogoegst/fileserver"
 	"github.com/nogoegst/onionutil"
 )
 
@@ -91,7 +92,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
 	case "":
-		handler, err = FileServer(p.Path, p.Zip, p.Debug)
+		handler, err = fileserver.New(p.Path, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
