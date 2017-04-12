@@ -12,19 +12,15 @@ func checkSlug(req *http.Request, slug string) error {
 		return nil
 	}
 	shost := strings.Split(req.Host, ".")
-	if len(shost) != 3 {
-		return fmt.Errorf("Wrong hostname to have a slug")
+	if len(shost) < 3 {
+		return fmt.Errorf("hostname is too short")
 	}
-	if len(shost[0]) < slugLength {
-		return fmt.Errorf("Subdomain is too short to have a slug in it")
-	}
-	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(shost[0][:len(slug)])) {
-		return fmt.Errorf("Wrong slug")
+	if 1 != subtle.ConstantTimeCompare([]byte(slug), []byte(shost[len(shost)-3])) {
+		return fmt.Errorf("wrong slug")
 	}
 	return nil
 }
 
-// TODO: make it less specific
 func SubdomainSluggedHandler(h http.Handler, slug string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
