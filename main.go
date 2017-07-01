@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/nogoegst/byteqr"
 	libonionize "github.com/nogoegst/onionize/lib"
@@ -18,15 +19,21 @@ import (
 var debug bool
 
 func main() {
+	defaultNoOnionFlag := false
+	defaultNoSlugFlag := false
+	if strings.HasSuffix(os.Args[0], "expoze") {
+		defaultNoOnionFlag = true
+		defaultNoSlugFlag = true
+	}
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
-	var noslugFlag = flag.Bool("noslug", false,
+	var noSlugFlag = flag.Bool("noslug", defaultNoSlugFlag,
 		"Do not use slugs")
 	var zipFlag = flag.Bool("zip", false,
 		"Serve zip file contents")
 	var qrFlag = flag.Bool("qr", false,
 		"Print link in QR code to stdout")
-	var noOnionFlag = flag.Bool("noonion", false,
+	var noOnionFlag = flag.Bool("noonion", defaultNoOnionFlag,
 		"Run in outside-reachable mode without onion service")
 	var passphraseFlag = flag.Bool("p", false,
 		"Ask for passphrase to generate onion key")
@@ -65,7 +72,7 @@ func main() {
 			ControlPath:     *control,
 			ControlPassword: *controlPasswd,
 			Path:            flag.Args()[0],
-			Slug:            !*noslugFlag,
+			Slug:            !*noSlugFlag,
 			Zip:             *zipFlag,
 			NoOnion:         *noOnionFlag,
 		}
