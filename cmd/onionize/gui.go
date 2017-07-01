@@ -16,7 +16,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	libonionize "github.com/nogoegst/onionize/lib"
+	"github.com/nogoegst/onionize/onionize"
 	"rsc.io/qr"
 )
 
@@ -24,7 +24,7 @@ const applicationTitle = "onionize"
 
 var win *gtk.Window
 
-func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan url.URL, errChan <-chan error) {
+func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errChan <-chan error) {
 	gtk.Init(nil)
 
 	var err error
@@ -154,7 +154,7 @@ func guiMain(paramsCh chan<- libonionize.Parameters, linkChan <-chan url.URL, er
 			log.Fatalf("Unable to get passphrase: %v", err)
 		}
 		fadeOut()
-		p := libonionize.Parameters{
+		p := onionize.Parameters{
 			Debug:           debug,
 			ControlPath:     "default://",
 			ControlPassword: "",

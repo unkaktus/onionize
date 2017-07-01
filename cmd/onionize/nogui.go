@@ -12,9 +12,9 @@ import (
 	"log"
 	"net/url"
 
-	libonionize "github.com/nogoegst/onionize/lib"
+	"github.com/nogoegst/onionize"
 )
 
-func guiMain(chan libonionize.Parameters, chan url.URL, chan error) {
+func guiMain(chan onionize.Parameters, chan url.URL, chan error) {
 	log.Fatal("Please specify path to target")
 }

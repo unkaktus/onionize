@@ -11,11 +11,11 @@ Install
 -------
 CLI-only version:
 ```
-$ go get github.com/nogoegst/onionize
+$ go get github.com/nogoegst/onionize/cmd/onionize
 ```
 CLI + GUI version (reqiures GTK3 installed):
 ```
-$ go get -tags gui github.com/nogoegst/onionize
+$ go get -tags gui github.com/nogoegst/onionize/cmd/onionize
 ```
 
 Usage

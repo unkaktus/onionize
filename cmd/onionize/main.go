@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/nogoegst/byteqr"
-	libonionize "github.com/nogoegst/onionize/lib"
+	"github.com/nogoegst/onionize"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
 	"rsc.io/qr"
@@ -50,14 +50,14 @@ func main() {
 	flag.Parse()
 
 	debug = *debugFlag
-	paramsCh := make(chan libonionize.Parameters)
+	paramsCh := make(chan onionize.Parameters)
 	linkChan := make(chan url.URL)
 	errChan := make(chan error)
 
 	go func() {
 		p := <-paramsCh
 		go func() {
-			errChan <- libonionize.Onionize(p, linkChan)
+			errChan <- onionize.Onionize(p, linkChan)
 		}()
 	}()
 
@@ -67,7 +67,7 @@ func main() {
 		if len(flag.Args()) != 1 {
 			log.Fatalf("You should specify exactly one path/target URL")
 		}
-		p := libonionize.Parameters{
+		p := onionize.Parameters{
 			Debug:           debug,
 			ControlPath:     *control,
 			ControlPassword: *controlPasswd,
@@ -80,10 +80,10 @@ func main() {
 			var err error
 			p.TLSConfig = &tls.Config{
 				/*
-				CipherSuites: []uint16{
-					tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-					tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				},
+					CipherSuites: []uint16{
+						tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+						tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+					},
 				*/
 				Certificates: make([]tls.Certificate, 1),
 			}
