@@ -16,7 +16,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/nogoegst/onionize/onionize"
+	"github.com/nogoegst/onionize"
 	"rsc.io/qr"
 )
 
@@ -158,7 +158,7 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 			Debug:           debug,
 			ControlPath:     "default://",
 			ControlPassword: "",
-			Path:            path,
+			Pathspec:        path,
 			Zip:             "zip" == combo.GetActiveText(),
 			Slug:            slugChkBox.GetActive(),
 			Passphrase:      passphrase,

@@ -25,7 +25,7 @@ import (
 const slugLength = 16
 
 type Parameters struct {
-	Path            string
+	Pathspec        string
 	Zip             bool
 	Slug            bool
 	ControlPath     string
@@ -65,7 +65,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		AwaitForUpload: true,
 	}
 
-	target, err := url.Parse(p.Path)
+	target, err := url.Parse(p.Pathspec)
 	if err != nil {
 		return fmt.Errorf("Unable to parse target URL: %v", err)
 	}
@@ -73,7 +73,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	case "http", "https":
 		handler = OnionReverseHTTPProxy(target)
 	case "":
-		handler, err = fileserver.New(p.Path, p.Zip, p.Debug)
+		handler, err = fileserver.New(p.Pathspec, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}

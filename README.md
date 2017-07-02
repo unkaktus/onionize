@@ -20,10 +20,10 @@ $ go get -tags gui github.com/nogoegst/onionize/cmd/onionize
 
 Usage
 -----
-To onionize a thing pass the path to it:
+To onionize things pass the path to them with optional aliases:
 
 ```
-$ onionize /path/to/thing
+$ onionize /path/to/thing:/things/thing1 /path/to/another/thing:/things/thing2
 ```
 
 or the URL:

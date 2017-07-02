@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/nogoegst/byteqr"
+	"github.com/nogoegst/fileserver"
 	"github.com/nogoegst/onionize"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
@@ -64,14 +65,11 @@ func main() {
 	if len(flag.Args()) == 0 {
 		guiMain(paramsCh, linkChan, errChan)
 	} else {
-		if len(flag.Args()) != 1 {
-			log.Fatalf("You should specify exactly one path/target URL")
-		}
 		p := onionize.Parameters{
 			Debug:           debug,
 			ControlPath:     *control,
 			ControlPassword: *controlPasswd,
-			Path:            flag.Args()[0],
+			Pathspec:        fileserver.JoinPathspec(flag.Args()),
 			Slug:            !*noSlugFlag,
 			Zip:             *zipFlag,
 			NoOnion:         *noOnionFlag,
