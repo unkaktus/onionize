@@ -16,6 +16,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/fileserver"
@@ -49,8 +50,8 @@ func generateSlug() (string, error) {
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
 	var handler http.Handler
 	var slug string
+	var err error
 	if p.Slug && !p.NoOnion {
-		var err error
 		slug, err = generateSlug()
 		if err != nil {
 			return fmt.Errorf("Unable to generate slug: %v", err)
@@ -65,20 +66,17 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		AwaitForUpload: true,
 	}
 
-	target, err := url.Parse(p.Pathspec)
-	if err != nil {
-		return fmt.Errorf("Unable to parse target URL: %v", err)
-	}
-	switch target.Scheme {
-	case "http", "https":
+	if strings.HasPrefix(p.Pathspec, "http://") || strings.HasPrefix(p.Pathspec, "https://") {
+		target, err := url.Parse(p.Pathspec)
+		if err != nil {
+			return fmt.Errorf("Unable to parse target URL: %v", err)
+		}
 		handler = OnionReverseHTTPProxy(target)
-	case "":
+	} else {
 		handler, err = fileserver.New(p.Pathspec, p.Zip, p.Debug)
 		if err != nil {
 			return err
 		}
-	default:
-		return fmt.Errorf("Unsupported target type: %s", target.Scheme)
 	}
 	server := &http.Server{Handler: SubdomainSluggedHandler(handler, slug)}
 
