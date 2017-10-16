@@ -14,6 +14,7 @@ import (
 	"github.com/nogoegst/onionize"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
+	"github.com/nogoegst/tlspin"
 	"rsc.io/qr"
 )
 
@@ -47,7 +48,9 @@ func main() {
 	var tlsCertPath = flag.String("tls-cert", "",
 		"Path to TLS certificate")
 	var tlsKeyPath = flag.String("tls-key", "",
-		"Path tp TLS private key")
+		"Path to TLS private key")
+	var tlspinKey = flag.String("tlspin-key", "",
+		"tlspin private key (\"whateverkey\" to generate one)")
 	flag.Parse()
 
 	debug = *debugFlag
@@ -88,6 +91,12 @@ func main() {
 			p.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(*tlsCertPath, *tlsKeyPath)
 			if err != nil {
 				log.Fatalf("Unable to load TLS keypair: %v", err)
+			}
+		} else if *tlspinKey != "" {
+			var err error
+			p.TLSConfig, err = tlspin.TLSServerConfig(*tlspinKey)
+			if err != nil {
+				log.Fatalf("unable to load tlspin private key: %v", err)
 			}
 		}
 		if *passphraseFlag {
