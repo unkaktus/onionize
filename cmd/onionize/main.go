@@ -21,10 +21,10 @@ import (
 var debug bool
 
 func main() {
-	defaultNoOnionFlag := false
+	defaultLocalFlag := false
 	defaultNoSlugFlag := false
 	if strings.HasSuffix(os.Args[0], "expoze") {
-		defaultNoOnionFlag = true
+		defaultLocalFlag = true
 		defaultNoSlugFlag = true
 	}
 	var debugFlag = flag.Bool("debug", false,
@@ -35,7 +35,7 @@ func main() {
 		"Serve zip file contents")
 	var qrFlag = flag.Bool("qr", false,
 		"Print link in QR code to stdout")
-	var noOnionFlag = flag.Bool("noonion", defaultNoOnionFlag,
+	var localFlag = flag.Bool("local", defaultLocalFlag,
 		"Run in outside-reachable mode without onion service")
 	var noTLSFlag = flag.Bool("no-tls", false,
 		"Disable TLS")
@@ -77,11 +77,11 @@ func main() {
 			Pathspec:        fileserver.JoinPathspec(flag.Args()),
 			Slug:            !*noSlugFlag,
 			Zip:             *zipFlag,
-			NoOnion:         *noOnionFlag,
+			NoOnion:         *localFlag,
 		}
 		if !(*noTLSFlag) { // TLS enabled
 			// default to tlspin tofu by default for local mode
-			if *tlspinKey == "" && *noOnionFlag {
+			if *tlspinKey == "" && *localFlag {
 				*tlspinKey = "whatever"
 			}
 
