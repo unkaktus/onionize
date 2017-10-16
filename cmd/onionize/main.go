@@ -29,7 +29,7 @@ func main() {
 	}
 	var debugFlag = flag.Bool("debug", false,
 		"Show what's happening")
-	var noSlugFlag = flag.Bool("noslug", defaultNoSlugFlag,
+	var noSlugFlag = flag.Bool("no-slug", defaultNoSlugFlag,
 		"Do not use slugs")
 	var zipFlag = flag.Bool("zip", false,
 		"Serve zip file contents")
