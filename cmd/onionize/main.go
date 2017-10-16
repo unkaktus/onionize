@@ -37,6 +37,8 @@ func main() {
 		"Print link in QR code to stdout")
 	var noOnionFlag = flag.Bool("noonion", defaultNoOnionFlag,
 		"Run in outside-reachable mode without onion service")
+	var noTLSFlag = flag.Bool("no-tls", false,
+		"Disable TLS")
 	var passphraseFlag = flag.Bool("p", false,
 		"Ask for passphrase to generate onion key")
 	var control = flag.String("control-addr", "default://",
@@ -77,26 +79,33 @@ func main() {
 			Zip:             *zipFlag,
 			NoOnion:         *noOnionFlag,
 		}
-		if *tlsCertPath != "" && *tlsKeyPath != "" {
-			var err error
-			p.TLSConfig = &tls.Config{
-				/*
-					CipherSuites: []uint16{
-						tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-						tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-					},
-				*/
-				Certificates: make([]tls.Certificate, 1),
+		if !(*noTLSFlag) { // TLS enabled
+			// default to tlspin tofu by default for local mode
+			if *tlspinKey == "" && *noOnionFlag {
+				*tlspinKey = "whatever"
 			}
-			p.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(*tlsCertPath, *tlsKeyPath)
-			if err != nil {
-				log.Fatalf("Unable to load TLS keypair: %v", err)
-			}
-		} else if *tlspinKey != "" {
-			var err error
-			p.TLSConfig, err = tlspin.TLSServerConfig(*tlspinKey)
-			if err != nil {
-				log.Fatalf("unable to load tlspin private key: %v", err)
+
+			if *tlsCertPath != "" && *tlsKeyPath != "" {
+				var err error
+				p.TLSConfig = &tls.Config{
+					/*
+						CipherSuites: []uint16{
+							tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+							tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+						},
+					*/
+					Certificates: make([]tls.Certificate, 1),
+				}
+				p.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(*tlsCertPath, *tlsKeyPath)
+				if err != nil {
+					log.Fatalf("Unable to load TLS keypair: %v", err)
+				}
+			} else if *tlspinKey != "" {
+				var err error
+				p.TLSConfig, err = tlspin.TLSServerConfig(*tlspinKey)
+				if err != nil {
+					log.Fatalf("unable to load tlspin private key: %v", err)
+				}
 			}
 		}
 		if *passphraseFlag {
