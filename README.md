@@ -68,10 +68,16 @@ $ onionize -id-key onion.key /path/to/the-thing
 
 TLS
 ---
-Yeah, tee-el-es... Specifying paths to X.509 key and certificate:
+You can specify [tlspin](https://github.com/nogoegst/tlspin) private key
+via `-tlspin-key` flag.
+
+When running with `-local` flag TLS enabled by default via tlspin with
+a generated ephemeral key.
+
+One can also specifying paths to X.509 key and certificate:
 
 ```
 $ onionize -tls-cert server.crt -tls-key server.key /path/to/the-thing
 ```
-produces `https` onion site. `*_WITH_CHACHA20_POLY1305` are the only
-enabled cipher suites.
+
+To disabe TLS run `onionize` with `-no-tls`.
