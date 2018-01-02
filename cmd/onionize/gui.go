@@ -26,9 +26,9 @@ const applicationTitle = "onionize"
 var win *gtk.Window
 
 const (
-	File             = "a file"
-	Directory        = "a directory"
-	Zip              = "contents of zip"
+	FileText         = "a file"
+	DirectoryText    = "a directory"
+	ZipText          = "contents of zip"
 	ActionButtonText = "create share"
 )
 
@@ -68,9 +68,9 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 	if err != nil {
 		log.Fatal(err)
 	}
-	combo.AppendText(File)
-	combo.AppendText(Directory)
-	combo.AppendText(Zip)
+	combo.AppendText(FileText)
+	combo.AppendText(DirectoryText)
+	combo.AppendText(ZipText)
 	combo.SetActive(0)
 	grid.Attach(combo, 1, 0, 1, 1)
 
@@ -85,17 +85,17 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 	updateFileChooser := func(pathtype string) {
 		var err error
 		switch pathtype {
-		case Directory:
+		case DirectoryText:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
 			if err != nil {
 				log.Fatal(err)
 			}
-		case File:
+		case FileText:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
 			}
-		case Zip:
+		case ZipText:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
@@ -122,7 +122,7 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 		activeText := combo.GetActiveText()
 		updateFileChooser(activeText)
 	})
-	updateFileChooser(File)
+	updateFileChooser(FileText)
 
 	// slug row
 	/*
@@ -190,7 +190,7 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 			}
 		*/
 		fadeOut()
-		zip := combo.GetActiveText() == Zip
+		zip := combo.GetActiveText() == ZipText
 		p := onionize.Parameters{
 			Debug:           debug,
 			ControlPath:     "default://",
