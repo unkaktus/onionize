@@ -9,6 +9,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/url"
 	"os"
@@ -23,6 +24,13 @@ import (
 const applicationTitle = "onionize"
 
 var win *gtk.Window
+
+const (
+	File             = "a file"
+	Directory        = "a directory"
+	Zip              = "contents of zip"
+	ActionButtonText = "create share"
+)
 
 func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errChan <-chan error) {
 	gtk.Init(nil)
@@ -49,50 +57,45 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 	grid.SetRowSpacing(12)
 	grid.SetColumnSpacing(12)
 
-	slugChkBox, err := gtk.CheckButtonNewWithLabel("slug")
+	// share type picker
+	shareTypePickerLabel, err := gtk.LabelNew("I want to share")
 	if err != nil {
 		log.Fatal(err)
 	}
-	slugChkBox.SetActive(true)
-	slugChkBox.SetHAlign(gtk.ALIGN_CENTER)
-	grid.Attach(slugChkBox, 0, 1, 1, 1)
-
-	passphraseEntry, err := gtk.EntryNew()
-	if err != nil {
-		log.Fatal("Unable to create entry:", err)
-	}
-	passphraseEntry.SetHExpand(true)
-	passphraseEntry.SetPlaceholderText("identity passphrase")
-	passphraseEntry.SetInputPurpose(gtk.INPUT_PURPOSE_PASSWORD)
-	passphraseEntry.SetVisibility(false)
-
-	grid.Attach(passphraseEntry, 1, 1, 1, 1)
+	grid.Attach(shareTypePickerLabel, 0, 0, 1, 1)
 
 	combo, err := gtk.ComboBoxTextNew()
 	if err != nil {
 		log.Fatal(err)
 	}
-	combo.AppendText("file")
-	combo.AppendText("directory")
-	combo.AppendText("zip")
+	combo.AppendText(File)
+	combo.AppendText(Directory)
+	combo.AppendText(Zip)
 	combo.SetActive(0)
-	grid.Attach(combo, 0, 0, 1, 1)
-	var fchooserBtn *gtk.FileChooserButton
+	grid.Attach(combo, 1, 0, 1, 1)
 
+	// file chooser
+	fileChooserLabel, err := gtk.LabelNew("located at")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grid.Attach(fileChooserLabel, 0, 1, 1, 1)
+
+	var fchooserBtn *gtk.FileChooserButton
 	updateFileChooser := func(pathtype string) {
 		var err error
 		switch pathtype {
-		case "directory":
+		case Directory:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
 			if err != nil {
 				log.Fatal(err)
 			}
-		case "file":
+		case File:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
 			}
-		case "zip":
+		case Zip:
 			fchooserBtn, err = gtk.FileChooserButtonNew("Select a path", gtk.FILE_CHOOSER_ACTION_OPEN)
 			if err != nil {
 				log.Fatal(err)
@@ -103,13 +106,15 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 			}
 			ffilter.AddPattern("*.zip")
 			fchooserBtn.AddFilter(ffilter)
+		default:
+			log.Fatal(errors.New("no file chooser of this type"))
 		}
 		fchooserBtn.SetHExpand(false)
-		w, err := grid.GetChildAt(1, 0)
+		w, err := grid.GetChildAt(1, 1)
 		if err == nil {
 			w.Destroy()
 		}
-		grid.Attach(fchooserBtn, 1, 0, 1, 1)
+		grid.Attach(fchooserBtn, 1, 1, 1, 1)
 		grid.ShowAll()
 		win.Resize(1, 1)
 	}
@@ -117,9 +122,38 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 		activeText := combo.GetActiveText()
 		updateFileChooser(activeText)
 	})
-	updateFileChooser("file")
+	updateFileChooser(File)
 
-	doBtn, err := gtk.ButtonNewWithLabel("onionize")
+	// slug row
+	/*
+		slugChkBoxLabel, err := gtk.LabelNew("secret prefix")
+		if err != nil {
+			log.Fatal(err)
+		}
+		grid.Attach(slugChkBoxLabel, 0, 3, 1, 1)
+		slugChkBox, err := gtk.CheckButtonNew()
+		if err != nil {
+			log.Fatal(err)
+		}
+		slugChkBox.SetActive(true)
+		slugChkBox.SetHAlign(gtk.ALIGN_CENTER)
+		grid.Attach(slugChkBox, 1, 3, 1, 1)
+	*/
+	// identity passphrase row
+	/*
+		passphraseEntry, err := gtk.EntryNew()
+		if err != nil {
+			log.Fatal("Unable to create entry:", err)
+		}
+		passphraseEntry.SetHExpand(true)
+		passphraseEntry.SetPlaceholderText("identity passphrase")
+		passphraseEntry.SetInputPurpose(gtk.INPUT_PURPOSE_PASSWORD)
+		passphraseEntry.SetVisibility(false)
+
+		grid.Attach(passphraseEntry, 1, 4, 1, 1)
+	*/
+	// action button
+	doBtn, err := gtk.ButtonNewWithLabel(ActionButtonText)
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
 	}
@@ -127,20 +161,20 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 	fadeOut := func() {
 		fchooserBtn.SetSensitive(false)
 		doBtn.SetSensitive(false)
-		doBtn.SetLabel("onionizing...")
+		doBtn.SetLabel("creating share...")
 		combo.SetSensitive(false)
-		slugChkBox.SetSensitive(false)
-		passphraseEntry.SetSensitive(false)
+		//slugChkBox.SetSensitive(false)
+		//passphraseEntry.SetSensitive(false)
 		grid.ShowAll()
 	}
 
 	fadeIn := func() {
 		fchooserBtn.SetSensitive(true)
 		doBtn.SetSensitive(true)
-		doBtn.SetLabel("onionize")
+		doBtn.SetLabel(ActionButtonText)
 		combo.SetSensitive(true)
-		slugChkBox.SetSensitive(true)
-		passphraseEntry.SetSensitive(true)
+		//slugChkBox.SetSensitive(true)
+		//passphraseEntry.SetSensitive(true)
 		grid.ShowAll()
 	}
 
@@ -149,10 +183,12 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 		if path == "" {
 			return
 		}
-		passphrase, err := passphraseEntry.GetText()
-		if err != nil {
-			log.Fatalf("Unable to get passphrase: %v", err)
-		}
+		/*
+			passphrase, err := passphraseEntry.GetText()
+			if err != nil {
+				log.Fatalf("Unable to get passphrase: %v", err)
+			}
+		*/
 		fadeOut()
 		p := onionize.Parameters{
 			Debug:           debug,
@@ -160,13 +196,13 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 			ControlPassword: "",
 			Pathspec:        path,
 			Zip:             "zip" == combo.GetActiveText(),
-			Slug:            slugChkBox.GetActive(),
-			Passphrase:      passphrase,
+			Slug:            true, //slugChkBox.GetActive(),
+			Passphrase:      "",   //passphrase,
 		}
 		paramsCh <- p
 
 	})
-	grid.Attach(doBtn, 0, 2, 2, 1)
+	grid.Attach(doBtn, 0, 5, 2, 1)
 
 	urlEntry, err := gtk.EntryNew()
 	if err != nil {
