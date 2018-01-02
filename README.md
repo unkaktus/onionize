@@ -81,3 +81,9 @@ $ onionize -tls-cert server.crt -tls-key server.key /path/to/the-thing
 ```
 
 To disabe TLS run `onionize` with `-no-tls`.
+
+Thanks
+------
+
+I want to thank Micah Lee for [OnionShare tool](https://github.com/micahflee/onionshare)
+by which onionize was inspired.
