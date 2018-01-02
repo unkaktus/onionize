@@ -190,12 +190,13 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 			}
 		*/
 		fadeOut()
+		zip := combo.GetActiveText() == Zip
 		p := onionize.Parameters{
 			Debug:           debug,
 			ControlPath:     "default://",
 			ControlPassword: "",
 			Pathspec:        path,
-			Zip:             "zip" == combo.GetActiveText(),
+			Zip:             zip,
 			Slug:            true, //slugChkBox.GetActive(),
 			Passphrase:      "",   //passphrase,
 		}
