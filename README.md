@@ -9,6 +9,8 @@ Much love to onion services.
 
 Install
 -------
+You have to have Go 1.8+ installed to build `onionize`.
+
 CLI-only version:
 ```
 $ go get github.com/nogoegst/onionize/cmd/onionize
