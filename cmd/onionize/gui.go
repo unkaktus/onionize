@@ -26,10 +26,11 @@ const applicationTitle = "onionize"
 var win *gtk.Window
 
 const (
-	FileText         = "a file"
-	DirectoryText    = "a directory"
-	ZipText          = "contents of zip"
-	ActionButtonText = "create share"
+	FileText           = "a file"
+	DirectoryText      = "a directory"
+	ZipText            = "contents of zip"
+	ActionButtonText   = "Start sharing"
+	ProgressButtonText = "Starting sharing..."
 )
 
 func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errChan <-chan error) {
@@ -161,7 +162,7 @@ func guiMain(paramsCh chan<- onionize.Parameters, linkChan <-chan url.URL, errCh
 	fadeOut := func() {
 		fchooserBtn.SetSensitive(false)
 		doBtn.SetSensitive(false)
-		doBtn.SetLabel("creating share...")
+		doBtn.SetLabel(ProgressButtonText)
 		combo.SetSensitive(false)
 		//slugChkBox.SetSensitive(false)
 		//passphraseEntry.SetSensitive(false)
