@@ -19,6 +19,9 @@ CLI + GUI version (reqiures GTK3 installed):
 ```
 $ go get -tags gui github.com/nogoegst/onionize/cmd/onionize
 ```
+If you have troubles setting up GUI version straight away, try to build it
+using Docker (see /dockerfiles). Also you may look into Dockerfiles themselves
+to reproduce building steps on your host OS.
 
 Usage
 -----

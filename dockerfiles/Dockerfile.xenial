@@ -1,0 +1,9 @@
+FROM nogoegst/golang-ubuntu:1.9-xenial
+RUN apt-get update
+RUN apt-get install -y git
+
+RUN apt-get install -y libgtk-3-dev libcairo2-dev libglib2.0-dev
+
+RUN dpkg -l libgtk-3-0
+
+CMD ["go", "get", "-v", "-tags","gtk_3_18 gui", "github.com/nogoegst/onionize/cmd/onionize"]
