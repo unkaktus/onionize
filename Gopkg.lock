@@ -3,109 +3,186 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:c2b25f10f8453e47cab40b91198852256c182df8b976a96cae5faa34683e0fd2"
   name = "github.com/dchest/blake2b"
   packages = ["."]
+  pruneopts = ""
   revision = "06006a921c7d13e3fdf63c401cb0e4529a26e6e4"
 
 [[projects]]
   branch = "master"
+  digest = "1:9ca3d3e9fcbba996c223d467f9b53bcaa8b90c61a3360ec31804e9290e197151"
   name = "github.com/gotk3/gotk3"
-  packages = ["cairo","gdk","glib","gtk","pango"]
+  packages = [
+    "cairo",
+    "gdk",
+    "glib",
+    "gtk",
+    "pango",
+  ]
+  pruneopts = ""
   revision = "bc0518bd018dea9c2cdfef44fe95ff1e51d8f46b"
 
 [[projects]]
+  digest = "1:9947f49fedb2602462b281279162c1d7e4377b956a76c070bb69866c59f7baf8"
   name = "github.com/nogoegst/balloon"
   packages = ["."]
+  pruneopts = ""
   revision = "0cdb89b860fe8e09dc762b9d9310ea03919c2278"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:90f8aba067744a6fd0573e504f47bf9c13977a1007d55572f03fa2d953a69a0b"
   name = "github.com/nogoegst/blake2xb"
   packages = ["."]
+  pruneopts = ""
   revision = "c843f17c526477c1b35ae7298b60c2a61a6b7c1c"
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:1aa598df8c943facf612a28331f2e83c3b7541916f3b6e6e4c24123ceca93dc6"
   name = "github.com/nogoegst/bulb"
   packages = ["."]
+  pruneopts = ""
   revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
   version = "v0.1.0"
 
 [[projects]]
+  digest = "1:506f8a2145a7b3f0b50b6bc0461f8dd2417fcfbb9b995fe9b17fc6cb28ba8f0c"
   name = "github.com/nogoegst/byteqr"
   packages = ["."]
+  pruneopts = ""
   revision = "9d23e71a41649b1df7ca1f2333f4524cdd3f56f7"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:ecc51be8a1dda6d86e7d4f51a6380b0483a1c01f5fae77e3be60ba1176eeb5f5"
   name = "github.com/nogoegst/fileserver"
   packages = ["."]
+  pruneopts = ""
   revision = "7e396b86f0337edd42c69924f38d570c81b7cbe6"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:29615333b2fb269ee434d89c84be61e8a7e9afb99b8484c04a342d41ad622704"
   name = "github.com/nogoegst/onionutil"
-  packages = [".","pkcs1","torparse"]
+  packages = [
+    ".",
+    "pkcs1",
+    "torparse",
+  ]
+  pruneopts = ""
   revision = "9e6926af662d42994031766a93333fae5c3930b2"
   version = "v0.3.0"
 
 [[projects]]
+  digest = "1:c52124c762cf5431a1e4fb5f9b2ae22b64b10971c049d85d99f56d56c84d933f"
   name = "github.com/nogoegst/pickfs"
   packages = ["."]
+  pruneopts = ""
   revision = "73a6d621480844a27c8595bc18224aff8bb2e01d"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:22792b0193e42742be515ee78cc28c7a2d55a8518385a2a50ec90c5d8bc9340a"
   name = "github.com/nogoegst/terminal"
   packages = ["."]
+  pruneopts = ""
   revision = "90cba33d8a32322cee41842a14fd3eab525fa22c"
 
 [[projects]]
+  digest = "1:50fb0a3f8d4b8f095df2d90ecda9a3f0de3348d034efd7d88f8b21a43eeafe05"
   name = "github.com/nogoegst/tlspin"
-  packages = [".","util"]
+  packages = [
+    ".",
+    "util",
+  ]
+  pruneopts = ""
   revision = "b7cda914feb00ca997934507d676bfe070859c11"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:cfec332ba3db9128eae5e8a62935aac6a8d974c6de68fa60fcc0c16eda8f6b25"
   name = "github.com/yawning/bulb"
-  packages = ["utils","utils/pkcs1"]
+  packages = [
+    "utils",
+    "utils/pkcs1",
+  ]
+  pruneopts = ""
   revision = "85d80d893c3d4a478b8c0abbc43f0ea13e1ce4f9"
 
 [[projects]]
   branch = "master"
+  digest = "1:f6a006d27619a4d93bf9b66fe1999b8c8d1fa62bdc63af14f10fbe6fcaa2aa1a"
   name = "golang.org/x/crypto"
-  packages = ["blake2b","ed25519","ed25519/internal/edwards25519","sha3"]
+  packages = [
+    "blake2b",
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "sha3",
+  ]
+  pruneopts = ""
   revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
 
 [[projects]]
   branch = "master"
+  digest = "1:130b1bec86c62e121967ee0c69d9c263dc2d3ffe6c7c9a82aca4071c4d068861"
   name = "golang.org/x/net"
   packages = ["proxy"]
+  pruneopts = ""
   revision = "9dfe39835686865bff950a07b394c12a98ddc811"
 
 [[projects]]
   branch = "master"
+  digest = "1:12a3d1f9268da0db1041ea3a91434d2b528efcf54dc3eb36f48f473d82eba18b"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = ""
   revision = "0ac51a24ef1c37380f98ba8b98f56e3bffd59850"
 
 [[projects]]
   branch = "master"
+  digest = "1:3fb1e52d981ace7965dcaf3e32a61a7a3e56ded1ec21a1a71f13448078010861"
   name = "golang.org/x/tools"
-  packages = ["godoc/vfs","godoc/vfs/httpfs","godoc/vfs/mapfs","godoc/vfs/zipfs"]
+  packages = [
+    "godoc/vfs",
+    "godoc/vfs/httpfs",
+    "godoc/vfs/mapfs",
+    "godoc/vfs/zipfs",
+  ]
+  pruneopts = ""
   revision = "6d70fb2e85323e81c89374331d3d2b93304faa36"
 
 [[projects]]
   branch = "master"
+  digest = "1:e106c72b32c194fa60e8ce1b09884d46bd1e477b90a7b67e5d66d69f7fce91b5"
   name = "rsc.io/qr"
-  packages = [".","coding","gf256"]
+  packages = [
+    ".",
+    "coding",
+    "gf256",
+  ]
+  pruneopts = ""
   revision = "48b2ede4844e13f1a2b7ce4d2529c9af7e359fc5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6e4887aaf2fd7daa923b0412182a529e80add3ec2fb9919635befb8672c36ca0"
+  input-imports = [
+    "github.com/gotk3/gotk3/gdk",
+    "github.com/gotk3/gotk3/glib",
+    "github.com/gotk3/gotk3/gtk",
+    "github.com/nogoegst/bulb",
+    "github.com/nogoegst/byteqr",
+    "github.com/nogoegst/fileserver",
+    "github.com/nogoegst/onionutil",
+    "github.com/nogoegst/terminal",
+    "github.com/nogoegst/tlspin",
+    "golang.org/x/tools/godoc/vfs/httpfs",
+    "golang.org/x/tools/godoc/vfs/mapfs",
+    "rsc.io/qr",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
