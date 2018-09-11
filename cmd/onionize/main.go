@@ -75,7 +75,7 @@ func main() {
 			ControlPath:     *control,
 			ControlPassword: *controlPasswd,
 			Pathspec:        fileserver.JoinPathspec(flag.Args()),
-			Slug:            !*noSlugFlag,
+			Slug:            true,
 			Zip:             *zipFlag,
 			NoOnion:         *localFlag,
 		}
@@ -121,6 +121,15 @@ func main() {
 			p.IdentityKey, _, err = onionutil.LoadPrivateKeyFile(*idKeyPath)
 			if err != nil {
 				log.Fatalf("Unable to load identity private key: %v", err)
+			}
+		}
+
+		if *noSlugFlag {
+			p.Slug = false
+		} else {
+			// Disable slugs when using TLS
+			if p.TLSConfig != nil {
+				p.Slug = false
 			}
 		}
 
