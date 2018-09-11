@@ -14,21 +14,43 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+
+	"golang.org/x/crypto/blake2b"
 )
 
-func RandomSerialNumber() (*big.Int, error) {
-	return rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+// generateSerialNumber generates a serial number for use in
+// a certificate from random source r.
+func generateSerialNumber(r io.Reader) (*big.Int, error) {
+	return rand.Int(r, new(big.Int).Lsh(big.NewInt(1), 128))
 }
 
+// GenerateEphemeralCert generates an ephemeral TLS certificate
+// from private key sk in reproducible manner: every call to
+// GenerateEphemeralCert with the same sk value it produces
+// exactly the same certificate.
 func GenerateEphemeralCert(sk interface{}) ([]byte, error) {
-	serialNumber, err := RandomSerialNumber()
+	pkix, err := x509.MarshalPKIXPublicKey(publicKey(sk))
 	if err != nil {
-		return nil, err
+		panic(err)
+	}
+	r, err := blake2b.NewXOF(blake2b.OutputLengthUnknown, nil)
+	if err != nil {
+		panic(err)
+	}
+	r.Write(pkix)
+
+	// Generate a serial number based on the public key.
+	serialNumber, err := generateSerialNumber(r)
+	if err != nil {
+		panic(err)
 	}
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 	}
-	der, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(sk), sk)
+	// Use XOF stream derived from the public key for signature as well.
+	// It doesn't hurt security ECDSA signature as we sign exactly one document
+	// with this random value.
+	der, err := x509.CreateCertificate(r, &template, &template, publicKey(sk), sk)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate certificate: %s", err)
 	}

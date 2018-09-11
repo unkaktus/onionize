@@ -2,16 +2,16 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:c2b25f10f8453e47cab40b91198852256c182df8b976a96cae5faa34683e0fd2"
+  digest = "1:6d9f91ff6cc1a7fa2f1c7025b0dc50ea7cd2a9b6869205bc7f69f484a349c731"
   name = "github.com/dchest/blake2b"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "06006a921c7d13e3fdf63c401cb0e4529a26e6e4"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:9ca3d3e9fcbba996c223d467f9b53bcaa8b90c61a3360ec31804e9290e197151"
+  digest = "1:2164b8677836e88423e54095b3e5c7b235fce69fbce19b43c66e1bc40cb9fa03"
   name = "github.com/gotk3/gotk3"
   packages = [
     "cairo",
@@ -20,102 +20,102 @@
     "gtk",
     "pango",
   ]
-  pruneopts = ""
-  revision = "bc0518bd018dea9c2cdfef44fe95ff1e51d8f46b"
+  pruneopts = "UT"
+  revision = "020531a77b59a5b3207bb81f482216cf459c49a5"
 
 [[projects]]
-  digest = "1:9947f49fedb2602462b281279162c1d7e4377b956a76c070bb69866c59f7baf8"
+  digest = "1:cc1ee20f2c17948695e1a0bfbb3c7d2c8c08386ef90836a935f29882b501fe32"
   name = "github.com/nogoegst/balloon"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "0cdb89b860fe8e09dc762b9d9310ea03919c2278"
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:90f8aba067744a6fd0573e504f47bf9c13977a1007d55572f03fa2d953a69a0b"
+  digest = "1:df037037cd75f8c3579eb4e59c7db7fc32ed3732d36920420e5d8999f4407508"
   name = "github.com/nogoegst/blake2xb"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "c843f17c526477c1b35ae7298b60c2a61a6b7c1c"
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:1aa598df8c943facf612a28331f2e83c3b7541916f3b6e6e4c24123ceca93dc6"
+  digest = "1:1195d74204a251a08795ddf0ea5896935697d2d29f4df49e3f2c62ba29258f68"
   name = "github.com/nogoegst/bulb"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:506f8a2145a7b3f0b50b6bc0461f8dd2417fcfbb9b995fe9b17fc6cb28ba8f0c"
+  digest = "1:5cd19cd2a3265eb792dd13a137b6d52c2b6efba536a2cf6f6fc84836208ed05b"
   name = "github.com/nogoegst/byteqr"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "9d23e71a41649b1df7ca1f2333f4524cdd3f56f7"
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:ecc51be8a1dda6d86e7d4f51a6380b0483a1c01f5fae77e3be60ba1176eeb5f5"
+  digest = "1:8cf01f4f32d33d93b72cc133482733373243052aa68d168c8af672eac58642c4"
   name = "github.com/nogoegst/fileserver"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "7e396b86f0337edd42c69924f38d570c81b7cbe6"
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:29615333b2fb269ee434d89c84be61e8a7e9afb99b8484c04a342d41ad622704"
+  digest = "1:033e03116b5e8d51b0000a47d732a9633d407d3753ee3de44aaeaefbd7b81400"
   name = "github.com/nogoegst/onionutil"
   packages = [
     ".",
     "pkcs1",
     "torparse",
   ]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "9e6926af662d42994031766a93333fae5c3930b2"
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:c52124c762cf5431a1e4fb5f9b2ae22b64b10971c049d85d99f56d56c84d933f"
+  digest = "1:88a6ac7b8cdbd5977b4d8e6af4d59bef719e036289981758ee1cf85b9640a036"
   name = "github.com/nogoegst/pickfs"
   packages = ["."]
-  pruneopts = ""
-  revision = "73a6d621480844a27c8595bc18224aff8bb2e01d"
-  version = "v1.0.0"
+  pruneopts = "UT"
+  revision = "b32e3d370c8725777e6ce81e22ccc9300db12c0f"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:22792b0193e42742be515ee78cc28c7a2d55a8518385a2a50ec90c5d8bc9340a"
+  digest = "1:63495b98b985c6a966a30e693383e06fe2b9a2e0c548c3cfedd9f6a046e6c6e3"
   name = "github.com/nogoegst/terminal"
   packages = ["."]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "90cba33d8a32322cee41842a14fd3eab525fa22c"
 
 [[projects]]
-  digest = "1:50fb0a3f8d4b8f095df2d90ecda9a3f0de3348d034efd7d88f8b21a43eeafe05"
+  digest = "1:067930f237bfc22b61f599ceae80245bd412d5135bbde9606c53287b9b40204a"
   name = "github.com/nogoegst/tlspin"
   packages = [
     ".",
     "util",
   ]
-  pruneopts = ""
-  revision = "b7cda914feb00ca997934507d676bfe070859c11"
-  version = "v1.0.0"
+  pruneopts = "UT"
+  revision = "7253c63bc0e7ea81ccd37584d16849da21be27ee"
+  version = "v2.1.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:cfec332ba3db9128eae5e8a62935aac6a8d974c6de68fa60fcc0c16eda8f6b25"
+  digest = "1:75306afcf415fae52a98f0c9372c568bdd36c155a96e4753d3ed6219c3b1cb37"
   name = "github.com/yawning/bulb"
   packages = [
     "utils",
     "utils/pkcs1",
   ]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "85d80d893c3d4a478b8c0abbc43f0ea13e1ce4f9"
 
 [[projects]]
   branch = "master"
-  digest = "1:f6a006d27619a4d93bf9b66fe1999b8c8d1fa62bdc63af14f10fbe6fcaa2aa1a"
+  digest = "1:d677133c111a45d489db03aa17a892c681b4d7ec4e57687d114ab711baa007e7"
   name = "golang.org/x/crypto"
   packages = [
     "blake2b",
@@ -123,28 +123,34 @@
     "ed25519/internal/edwards25519",
     "sha3",
   ]
-  pruneopts = ""
-  revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
+  pruneopts = "UT"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
-  digest = "1:130b1bec86c62e121967ee0c69d9c263dc2d3ffe6c7c9a82aca4071c4d068861"
+  digest = "1:8c520a50d95df847d7732e971616b443afb0d95c3be465e3952bfde515d4e47a"
   name = "golang.org/x/net"
-  packages = ["proxy"]
-  pruneopts = ""
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  packages = [
+    "internal/socks",
+    "proxy",
+  ]
+  pruneopts = "UT"
+  revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
 
 [[projects]]
   branch = "master"
-  digest = "1:12a3d1f9268da0db1041ea3a91434d2b528efcf54dc3eb36f48f473d82eba18b"
+  digest = "1:711af68777cecdb46e65dc72c0878c47872c1d39c12a198ded31d36a783a9aff"
   name = "golang.org/x/sys"
-  packages = ["unix"]
-  pruneopts = ""
-  revision = "0ac51a24ef1c37380f98ba8b98f56e3bffd59850"
+  packages = [
+    "cpu",
+    "unix",
+  ]
+  pruneopts = "UT"
+  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
   branch = "master"
-  digest = "1:3fb1e52d981ace7965dcaf3e32a61a7a3e56ded1ec21a1a71f13448078010861"
+  digest = "1:1539a7f8e2f7cd085dfde152a758f0b78a023cf0d48500ea0a3fd4b09f2d7e48"
   name = "golang.org/x/tools"
   packages = [
     "godoc/vfs",
@@ -152,20 +158,20 @@
     "godoc/vfs/mapfs",
     "godoc/vfs/zipfs",
   ]
-  pruneopts = ""
-  revision = "6d70fb2e85323e81c89374331d3d2b93304faa36"
+  pruneopts = "UT"
+  revision = "18207bb12d3a3338e74403fed8ca1ba866dd3a57"
 
 [[projects]]
   branch = "master"
-  digest = "1:e106c72b32c194fa60e8ce1b09884d46bd1e477b90a7b67e5d66d69f7fce91b5"
+  digest = "1:5f7a1c7de691189fe96681441220afb5c2567b1875e8b2c06201732be4b9393a"
   name = "rsc.io/qr"
   packages = [
     ".",
     "coding",
     "gf256",
   ]
-  pruneopts = ""
-  revision = "48b2ede4844e13f1a2b7ce4d2529c9af7e359fc5"
+  pruneopts = "UT"
+  revision = "ca9a01fc2f9505024045632c50e5e8cd6142fafe"
 
 [solve-meta]
   analyzer-name = "dep"

@@ -106,3 +106,7 @@ func (fs pickfs) ReadDir(p string) ([]os.FileInfo, error) {
 	}
 	return fis, nil
 }
+
+func (fs pickfs) RootType(string) vfs.RootType {
+	return ""
+}

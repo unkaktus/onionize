@@ -4,6 +4,7 @@
 // and related or neighboring rights to tlspin, using the Creative
 // Commons "CC0" public domain dedication. See LICENSE or
 // <http://creativecommons.org/publicdomain/zero/1.0/> for full details.
+// +build go1.8
 
 package tlspin
 
@@ -16,6 +17,11 @@ import (
 
 	util "github.com/nogoegst/tlspin/util"
 	"golang.org/x/crypto/blake2b"
+)
+
+const (
+	RandomKey = "whateverkey"
+	AnyKey    = "whateverkey"
 )
 
 var commonTLSConfig = &tls.Config{
@@ -46,7 +52,7 @@ func Listen(network, addr, privatekey string) (net.Listener, error) {
 }
 
 func verifyPeerCert(rawCerts [][]byte, publickey string) error {
-	if publickey == "whateverkey" {
+	if publickey == AnyKey {
 		return nil
 	}
 	pk, err := util.DecodeKey(publickey)

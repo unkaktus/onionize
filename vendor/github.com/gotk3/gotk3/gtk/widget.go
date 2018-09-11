@@ -60,6 +60,8 @@ func (v *Widget) toWidget() *C.GtkWidget {
 	return v.native()
 }
 
+
+
 func marshalWidget(p uintptr) (interface{}, error) {
 	c := C.g_value_get_object((*C.GValue)(unsafe.Pointer(p)))
 	obj := glib.Take(unsafe.Pointer(c))
@@ -79,12 +81,9 @@ func (v *Widget) HideOnDelete() {
 	C._gtk_widget_hide_on_delete(v.native())
 }
 
-/* TODO
 func (v *Widget) DragDestSet(flags DestDefaults, targets []TargetEntry, actions gdk.DragAction) {
-	C.gtk_drag_dest_set(v.native(), C.GtkDestDefaults(flags), (*C.GtkTargetEntry)(&targets[0]),
-		C.gint(len(targets)), C.GdkDragAction(actions))
+	C.gtk_drag_dest_set(v.native(), C.GtkDestDefaults(flags), (*C.GtkTargetEntry)(&targets[0]), C.gint(len(targets)), C.GdkDragAction(actions))
 }
-*/
 
 // ResetStyle is a wrapper around gtk_widget_reset_style().
 func (v *Widget) ResetStyle() {
@@ -623,4 +622,8 @@ func (v *Widget) GetPreferredWidth() (int, int) {
 	var minimum, natural C.gint
 	C.gtk_widget_get_preferred_width(v.native(), &minimum, &natural)
 	return int(minimum), int(natural)
+}
+
+func (v *Widget) InsertActionGroup(name string, group glib.IActionGroup) {
+	C.gtk_widget_insert_action_group(v.native(), (*C.gchar)(C.CString(name)), C.toGActionGroup(unsafe.Pointer(group.Native())))
 }
