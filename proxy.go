@@ -14,7 +14,7 @@ import (
 	"net/url"
 )
 
-func OnionReverseHTTPProxy(target *url.URL) *httputil.ReverseProxy {
+func onionReverseHTTPProxy(target *url.URL) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host

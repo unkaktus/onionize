@@ -71,7 +71,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		if err != nil {
 			return fmt.Errorf("Unable to parse target URL: %v", err)
 		}
-		handler = OnionReverseHTTPProxy(target)
+		handler = onionReverseHTTPProxy(target)
 	} else {
 		handler, err = fileserver.New(p.Pathspec, p.Zip, p.Debug)
 		if err != nil {
