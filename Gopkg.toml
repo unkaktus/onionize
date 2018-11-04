@@ -30,7 +30,8 @@
   name = "github.com/gotk3/gotk3"
 
 [[constraint]]
-  name = "github.com/nogoegst/bulb"
+  name = "github.com/yawning/bulb"
+  source = "github.com/nogoegst/bulb"
   version = "0.1.0"
 
 [[constraint]]

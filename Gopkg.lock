@@ -40,14 +40,6 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:1195d74204a251a08795ddf0ea5896935697d2d29f4df49e3f2c62ba29258f68"
-  name = "github.com/nogoegst/bulb"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
-  version = "v0.1.0"
-
-[[projects]]
   digest = "1:5cd19cd2a3265eb792dd13a137b6d52c2b6efba536a2cf6f6fc84836208ed05b"
   name = "github.com/nogoegst/byteqr"
   packages = ["."]
@@ -103,15 +95,17 @@
   version = "v2.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:75306afcf415fae52a98f0c9372c568bdd36c155a96e4753d3ed6219c3b1cb37"
+  digest = "1:9f46e8d9c014cabc752a1a2369037fdea2c0b9b7c41a6d57d06179a016f14fab"
   name = "github.com/yawning/bulb"
   packages = [
+    ".",
     "utils",
     "utils/pkcs1",
   ]
   pruneopts = "UT"
-  revision = "85d80d893c3d4a478b8c0abbc43f0ea13e1ce4f9"
+  revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
+  source = "github.com/nogoegst/bulb"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -180,12 +174,12 @@
     "github.com/gotk3/gotk3/gdk",
     "github.com/gotk3/gotk3/glib",
     "github.com/gotk3/gotk3/gtk",
-    "github.com/nogoegst/bulb",
     "github.com/nogoegst/byteqr",
     "github.com/nogoegst/fileserver",
     "github.com/nogoegst/onionutil",
     "github.com/nogoegst/terminal",
     "github.com/nogoegst/tlspin",
+    "github.com/yawning/bulb",
     "golang.org/x/tools/godoc/vfs/httpfs",
     "golang.org/x/tools/godoc/vfs/mapfs",
     "rsc.io/qr",

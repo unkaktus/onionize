@@ -18,9 +18,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/nogoegst/bulb"
 	"github.com/nogoegst/fileserver"
 	"github.com/nogoegst/onionutil"
+	"github.com/yawning/bulb"
 )
 
 const slugLength = 16
