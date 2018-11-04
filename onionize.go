@@ -78,7 +78,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 			return err
 		}
 	}
-	server := &http.Server{Handler: SubdomainSluggedHandler(handler, slug)}
+	server := &http.Server{Handler: subdomainSluggedHandler(handler, slug)}
 
 	listenAddress := "127.0.0.1:0"
 	if useOnion {

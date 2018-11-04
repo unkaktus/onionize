@@ -21,7 +21,7 @@ func checkSlug(req *http.Request, slug string) error {
 	return nil
 }
 
-func SubdomainSluggedHandler(h http.Handler, slug string) http.Handler {
+func subdomainSluggedHandler(h http.Handler, slug string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		err := checkSlug(req, slug)
