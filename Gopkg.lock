@@ -2,10 +2,10 @@
 
 
 [[projects]]
-  digest = "1:6d9f91ff6cc1a7fa2f1c7025b0dc50ea7cd2a9b6869205bc7f69f484a349c731"
+  digest = "1:f370e2eebadc63e19fcfcfe8f69321cc148f2d149a5f4830243f7e7298b2695d"
   name = "github.com/dchest/blake2b"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "06006a921c7d13e3fdf63c401cb0e4529a26e6e4"
   version = "v1.0.0"
 
@@ -20,30 +20,30 @@
     "gtk",
     "pango",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "020531a77b59a5b3207bb81f482216cf459c49a5"
 
 [[projects]]
-  digest = "1:cc1ee20f2c17948695e1a0bfbb3c7d2c8c08386ef90836a935f29882b501fe32"
+  digest = "1:fc38dd34ea8b7ac748d6f24adb7c6c6439ff1200948e3d34a5a78008c0f439cc"
   name = "github.com/nogoegst/balloon"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "0cdb89b860fe8e09dc762b9d9310ea03919c2278"
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:df037037cd75f8c3579eb4e59c7db7fc32ed3732d36920420e5d8999f4407508"
+  digest = "1:5a2f29f97352128a591111f5e3ba7eae7f083c307b928e53587ecd86ab9830ab"
   name = "github.com/nogoegst/blake2xb"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "c843f17c526477c1b35ae7298b60c2a61a6b7c1c"
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:5cd19cd2a3265eb792dd13a137b6d52c2b6efba536a2cf6f6fc84836208ed05b"
+  digest = "1:70fce086e29b8f909990461e0baddad32fd66f958dbab21c531ca9b3cf53885a"
   name = "github.com/nogoegst/byteqr"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "9d23e71a41649b1df7ca1f2333f4524cdd3f56f7"
   version = "v1.1.0"
 
@@ -51,7 +51,7 @@
   digest = "1:8cf01f4f32d33d93b72cc133482733373243052aa68d168c8af672eac58642c4"
   name = "github.com/nogoegst/fileserver"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "7e396b86f0337edd42c69924f38d570c81b7cbe6"
   version = "v1.0.0"
 
@@ -63,7 +63,7 @@
     "pkcs1",
     "torparse",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "9e6926af662d42994031766a93333fae5c3930b2"
   version = "v0.3.0"
 
@@ -71,7 +71,7 @@
   digest = "1:88a6ac7b8cdbd5977b4d8e6af4d59bef719e036289981758ee1cf85b9640a036"
   name = "github.com/nogoegst/pickfs"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "b32e3d370c8725777e6ce81e22ccc9300db12c0f"
   version = "v1.1.0"
 
@@ -80,7 +80,7 @@
   digest = "1:63495b98b985c6a966a30e693383e06fe2b9a2e0c548c3cfedd9f6a046e6c6e3"
   name = "github.com/nogoegst/terminal"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "90cba33d8a32322cee41842a14fd3eab525fa22c"
 
 [[projects]]
@@ -90,19 +90,19 @@
     ".",
     "util",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "7253c63bc0e7ea81ccd37584d16849da21be27ee"
   version = "v2.1.0"
 
 [[projects]]
-  digest = "1:9f46e8d9c014cabc752a1a2369037fdea2c0b9b7c41a6d57d06179a016f14fab"
+  digest = "1:e85997397df98de2355c6d7e05a4889935c37c72c5b164423b16c2836fb241b0"
   name = "github.com/yawning/bulb"
   packages = [
     ".",
     "utils",
     "utils/pkcs1",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
   source = "github.com/nogoegst/bulb"
   version = "v0.1.0"
@@ -117,7 +117,7 @@
     "ed25519/internal/edwards25519",
     "sha3",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
@@ -128,18 +128,18 @@
     "internal/socks",
     "proxy",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
 
 [[projects]]
   branch = "master"
-  digest = "1:711af68777cecdb46e65dc72c0878c47872c1d39c12a198ded31d36a783a9aff"
+  digest = "1:e219452908b4779ea049011b734cd3097b519b070b686ccf150bff9a96df73a3"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
@@ -152,19 +152,19 @@
     "godoc/vfs/mapfs",
     "godoc/vfs/zipfs",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "18207bb12d3a3338e74403fed8ca1ba866dd3a57"
 
 [[projects]]
   branch = "master"
-  digest = "1:5f7a1c7de691189fe96681441220afb5c2567b1875e8b2c06201732be4b9393a"
+  digest = "1:7623f89b7faa16aaffabe3a6236f7bec325ab9f7aa3d6bb9c25c0e1299be89da"
   name = "rsc.io/qr"
   packages = [
     ".",
     "coding",
     "gf256",
   ]
-  pruneopts = "UT"
+  pruneopts = "NUT"
   revision = "ca9a01fc2f9505024045632c50e5e8cd6142fafe"
 
 [solve-meta]
