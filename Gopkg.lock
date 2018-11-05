@@ -95,7 +95,18 @@
   version = "v2.1.0"
 
 [[projects]]
-  digest = "1:e85997397df98de2355c6d7e05a4889935c37c72c5b164423b16c2836fb241b0"
+  digest = "1:16d30357ca2ea08d70a31196b9ee9e345e68972165d9e3aabe58a1ecdfe9c196"
+  name = "github.com/nogoegst/wslpath"
+  packages = [
+    ".",
+    "mount",
+  ]
+  pruneopts = "NUT"
+  revision = "45d90c7c76f893ad67a0ac0c71e2868f275b5950"
+  version = "v0.1.0"
+
+[[projects]]
+  digest = "1:6b8bb59acfb7b259dd5cbab21e7acfe9b70a81b884bfb47c7fe05d50529952cb"
   name = "github.com/yawning/bulb"
   packages = [
     ".",
@@ -103,9 +114,9 @@
     "utils/pkcs1",
   ]
   pruneopts = "NUT"
-  revision = "72b4e31f8f9586520a39a659fb9d2e8e5719aacd"
+  revision = "59eddfe494d65683e094e4aad5fdde02e5c69082"
   source = "github.com/nogoegst/bulb"
-  version = "v0.1.0"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"

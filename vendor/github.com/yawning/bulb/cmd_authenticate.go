@@ -14,6 +14,8 @@ import (
 	"encoding/hex"
 	"io/ioutil"
 	"strings"
+
+	"github.com/nogoegst/wslpath"
 )
 
 // Authenticate authenticates with the Tor instance using the "best" possible
@@ -55,6 +57,9 @@ func (c *Conn) Authenticate(password string) error {
 
 		if pi.CookieFile == "" {
 			return newProtocolError("invalid (empty) COOKIEFILE")
+		}
+		if p, err := wslpath.FromWindows(pi.CookieFile); err == nil {
+			pi.CookieFile = p
 		}
 		cookie, err := ioutil.ReadFile(pi.CookieFile)
 		if err != nil {
