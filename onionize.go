@@ -36,6 +36,7 @@ type Parameters struct {
 	IdentityKey     crypto.PrivateKey
 	TLSConfig       *tls.Config
 	NoOnion         bool
+	StartTor        bool
 }
 
 func generateSlug() (string, error) {
@@ -48,6 +49,18 @@ func generateSlug() (string, error) {
 }
 
 func Onionize(p Parameters, linkChan chan<- url.URL) error {
+	// Run tor instance ourselves
+	if p.StartTor {
+		p.ControlPath = "tcp://127.0.0.1:9999"
+		torReady := make(chan struct{})
+		go func() {
+			err := runTor(torReady)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}()
+		<-torReady
+	}
 	var handler http.Handler
 	var slug string
 	var err error

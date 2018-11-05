@@ -53,6 +53,8 @@ func main() {
 		"Path to TLS private key")
 	var tlspinKey = flag.String("tlspin-key", "",
 		"tlspin private key (\"whateverkey\" to generate one)")
+	var startTor = flag.Bool("start-tor", false,
+		"start tor ourselves")
 	flag.Parse()
 
 	debug = *debugFlag
@@ -78,6 +80,7 @@ func main() {
 			Slug:            true,
 			Zip:             *zipFlag,
 			NoOnion:         *localFlag,
+			StartTor:        *startTor,
 		}
 		if !(*noTLSFlag) { // TLS enabled
 			// default to tlspin tofu by default for local mode
