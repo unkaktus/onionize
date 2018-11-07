@@ -16,6 +16,8 @@ github.com/nogoegst/fileserver v1.0.0 h1:oGzXAk63jaojrQJZLn73Vy00tDnJ81t+gj3xISR
 github.com/nogoegst/fileserver v1.0.0/go.mod h1:fBE2K9qZvErHyE9adjVIHrd/9fldUqyPBYBsmmppJXE=
 github.com/nogoegst/onionutil v0.3.0 h1:o4yVc/BrFo5/bGwNqd/6+9/mVM/Vc3m6KRUXz6QNImU=
 github.com/nogoegst/onionutil v0.3.0/go.mod h1:IQwtwzWRQyFFhXANxfOWZ5ujSvTeho4bLClNC3xNpVk=
+github.com/nogoegst/onionutil v1.1.0 h1:pWKjQ/500FWk9UFk+6BPSODfT9yYKeoUO2sw+FjgCT4=
+github.com/nogoegst/onionutil v1.1.0/go.mod h1:MGVLj/WrIE1xixFsS5r/grqmK1C/B4QQGIOeJxxcXVY=
 github.com/nogoegst/pickfs v1.1.0 h1:oQsZ8qyWQOdjrrNjr0bK/IhJRqA8vyA9qoxf9iLha8s=
 github.com/nogoegst/pickfs v1.1.0/go.mod h1:mimUaaEyJvDg2BiTdT3OYeanXIA1OUE7ZlX7l47H9ac=
 github.com/nogoegst/terminal v0.0.0-20161218222815-90cba33d8a32 h1:simxFvS/SVzTohFO1okadTzQUq6pPcIHaybXhmvJDuE=
@@ -26,6 +28,8 @@ github.com/nogoegst/wslpath v0.1.0 h1:hnUj8S2RSAJoljmOPgzseP3/XEDGy6nExsMI00mqUB
 github.com/nogoegst/wslpath v0.1.0/go.mod h1:KbpjFJTcFGLrBXgvCodBNB8fE1/ZSNP568f0KGntcSE=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b h1:2b9XGzhjiYsYPnKXoEfL7klWZQIt8IfyRCz62gCqqlQ=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
+golang.org/x/crypto v0.0.0-20181106171534-e4dc69e5b2fd h1:VtIkGDhk0ph3t+THbvXHfMZ8QHgsBO39Nh52+74pq7w=
+golang.org/x/crypto v0.0.0-20181106171534-e4dc69e5b2fd/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/net v0.0.0-20181107093936-a544f70c90f1 h1:SwqD3GJ9PsSBBVv1HlDeSwjjPSeZjUZQcAgGnwsWpyc=
 golang.org/x/net v0.0.0-20181107093936-a544f70c90f1/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e h1:o3PsSEY8E4eXWkXrIP9YJALUkVZqzHJT5DOasTyn8Vs=

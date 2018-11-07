@@ -1,5 +1,3 @@
-# github.com/dchest/blake2b v1.0.0
-github.com/dchest/blake2b
 # github.com/gotk3/gotk3 v0.0.0-20180905040958-020531a77b59
 github.com/gotk3/gotk3/gdk
 github.com/gotk3/gotk3/glib
@@ -18,7 +16,7 @@ github.com/nogoegst/bulb/utils/pkcs1
 github.com/nogoegst/byteqr
 # github.com/nogoegst/fileserver v1.0.0
 github.com/nogoegst/fileserver
-# github.com/nogoegst/onionutil v0.3.0
+# github.com/nogoegst/onionutil v1.1.0
 github.com/nogoegst/onionutil
 github.com/nogoegst/onionutil/pkcs1
 github.com/nogoegst/onionutil/torparse
@@ -32,7 +30,7 @@ github.com/nogoegst/tlspin/util
 # github.com/nogoegst/wslpath v0.1.0
 github.com/nogoegst/wslpath
 github.com/nogoegst/wslpath/mount
-# golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b
+# golang.org/x/crypto v0.0.0-20181106171534-e4dc69e5b2fd
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/sha3
