@@ -1,0 +1,24 @@
+Go implementation of BLAKE2b collision-resistant cryptographic hash function
+and related BLAKE2Xb XOF created by Jean-Philippe Aumasson, Samuel Neves,
+Zooko Wilcox-O'Hearn, and Christian Winnerlein (https://blake2.net).
+
+INSTALLATION
+
+    $ go get github.com/nogoegst/blake2xb
+
+
+DOCUMENTATION
+
+    See http://godoc.org/github.com/nogoegst/blake2xb
+
+
+PUBLIC DOMAIN DEDICATION
+
+BLAKE2b implementation written in 2012 by Dmitry Chestnykh.
+BLAKE2Xb implementation written in 2017 by Ivan Markin.
+
+To the extent possible under law, the authors have dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide. This software is distributed without any warranty.
+http://creativecommons.org/publicdomain/zero/1.0/
+

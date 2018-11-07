@@ -1,0 +1,54 @@
+# github.com/dchest/blake2b v1.0.0
+github.com/dchest/blake2b
+# github.com/gotk3/gotk3 v0.0.0-20180905040958-020531a77b59
+github.com/gotk3/gotk3/gdk
+github.com/gotk3/gotk3/glib
+github.com/gotk3/gotk3/gtk
+github.com/gotk3/gotk3/cairo
+github.com/gotk3/gotk3/pango
+# github.com/nogoegst/balloon v1.0.0
+github.com/nogoegst/balloon
+# github.com/nogoegst/blake2xb v1.0.1
+github.com/nogoegst/blake2xb
+# github.com/nogoegst/bulb v1.1.0
+github.com/nogoegst/bulb
+github.com/nogoegst/bulb/utils
+github.com/nogoegst/bulb/utils/pkcs1
+# github.com/nogoegst/byteqr v1.1.0
+github.com/nogoegst/byteqr
+# github.com/nogoegst/fileserver v1.0.0
+github.com/nogoegst/fileserver
+# github.com/nogoegst/onionutil v0.3.0
+github.com/nogoegst/onionutil
+github.com/nogoegst/onionutil/pkcs1
+github.com/nogoegst/onionutil/torparse
+# github.com/nogoegst/pickfs v1.1.0
+github.com/nogoegst/pickfs
+# github.com/nogoegst/terminal v0.0.0-20161218222815-90cba33d8a32
+github.com/nogoegst/terminal
+# github.com/nogoegst/tlspin v2.1.0+incompatible
+github.com/nogoegst/tlspin
+github.com/nogoegst/tlspin/util
+# github.com/nogoegst/wslpath v0.1.0
+github.com/nogoegst/wslpath
+github.com/nogoegst/wslpath/mount
+# golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/sha3
+golang.org/x/crypto/ed25519/internal/edwards25519
+# golang.org/x/net v0.0.0-20181107093936-a544f70c90f1
+golang.org/x/net/proxy
+golang.org/x/net/internal/socks
+# golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e
+golang.org/x/sys/unix
+golang.org/x/sys/cpu
+# golang.org/x/tools v0.0.0-20180910180008-18207bb12d3a
+golang.org/x/tools/godoc/vfs
+golang.org/x/tools/godoc/vfs/httpfs
+golang.org/x/tools/godoc/vfs/zipfs
+golang.org/x/tools/godoc/vfs/mapfs
+# rsc.io/qr v0.2.0
+rsc.io/qr
+rsc.io/qr/coding
+rsc.io/qr/gf256

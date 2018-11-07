@@ -17,7 +17,7 @@ import (
 	"net/textproto"
 	"sync"
 
-	bulbUtils "github.com/yawning/bulb/utils"
+	bulbUtils "github.com/nogoegst/bulb/utils"
 )
 
 const (
@@ -221,7 +221,7 @@ func Dial(network, addr string) (*Conn, error) {
 	return NewConn(c), nil
 }
 
-const(
+const (
 	torControlPort = "9051"
 	tbbControlPort = "9151"
 )

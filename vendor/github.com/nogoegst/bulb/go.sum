@@ -1,0 +1,4 @@
+github.com/nogoegst/wslpath v0.1.0 h1:hnUj8S2RSAJoljmOPgzseP3/XEDGy6nExsMI00mqUBs=
+github.com/nogoegst/wslpath v0.1.0/go.mod h1:KbpjFJTcFGLrBXgvCodBNB8fE1/ZSNP568f0KGntcSE=
+golang.org/x/net v0.0.0-20181107093936-a544f70c90f1 h1:SwqD3GJ9PsSBBVv1HlDeSwjjPSeZjUZQcAgGnwsWpyc=
+golang.org/x/net v0.0.0-20181107093936-a544f70c90f1/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=

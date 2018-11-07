@@ -1,0 +1,15 @@
+Go implementation of Balloon memory-hard hash (https://crypto.stanford.edu/balloon/)
+created by Dan Boneh, Henry Corrigan-Gibbs and Stuart Schechter.
+
+DOCUMENTATION
+
+    https://godoc.org/github.com/nogoegst/balloon
+
+PUBLIC DOMAIN DEDICATION
+
+Balloon implementation written in 2017 by Ivan Markin.
+
+To the extent possible under law, the author has dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide. This software is distributed without any warranty.
+See LICENSE file or http://creativecommons.org/publicdomain/zero/1.0/.
