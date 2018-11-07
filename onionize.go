@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/nogoegst/fileserver"
+	"github.com/nogoegst/onionize/util"
 	"github.com/nogoegst/onionutil"
 	"github.com/yawning/bulb"
 )
@@ -114,10 +115,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		}
 		// Derive onion service keymaterial from passphrase or generate a new one
 		if p.Passphrase != "" {
-			keyrd, err := onionutil.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
-			if err != nil {
-				return fmt.Errorf("Unable to create keystream: %v", err)
-			}
+			keyrd := util.KeystreamReader([]byte(p.Passphrase), []byte("onionize-keygen"))
 			privOnionKey, err := onionutil.GenerateOnionKey(keyrd, "current")
 			if err != nil {
 				return fmt.Errorf("Unable to generate onion key: %v", err)
