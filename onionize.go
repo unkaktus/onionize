@@ -162,7 +162,7 @@ func Onionize(p Parameters, linkChan chan<- url.URL) error {
 		nocfg.PortSpecs = []bulb.OnionPortSpec{portSpec}
 		oi, err := c.NewOnion(nocfg)
 		if err != nil {
-			return fmt.Errorf("Error occured while creating an onion service: %v", err)
+			return fmt.Errorf("Error occurred while creating an onion service: %v", err)
 		}
 		// Track if tor went down
 		// TODO: Signal from here to perform graceful shutdown and display a message
