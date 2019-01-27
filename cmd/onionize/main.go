@@ -9,13 +9,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nogoegst/byteqr"
 	"github.com/nogoegst/fileserver"
 	"github.com/nogoegst/onionize"
 	"github.com/nogoegst/onionutil"
 	"github.com/nogoegst/terminal"
+	"github.com/nogoegst/textqr"
 	"github.com/nogoegst/tlspin"
-	"rsc.io/qr"
 )
 
 var debug bool
@@ -143,7 +142,7 @@ func main() {
 			case link := <-linkChan:
 				linkString := link.String()
 				if *qrFlag {
-					byteqr.Write(os.Stdout, linkString, qr.L, nil, nil)
+					textqr.Write(os.Stdout, linkString, textqr.L, true, false)
 				}
 				fmt.Println(linkString)
 
