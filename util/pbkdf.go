@@ -10,7 +10,7 @@ package util
 import (
 	"io"
 
-	"github.com/nogoegst/balloon"
+	"github.com/unkaktus/balloon"
 	"golang.org/x/crypto/blake2b"
 )
 

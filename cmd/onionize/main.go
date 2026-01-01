@@ -9,12 +9,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nogoegst/fileserver"
-	"github.com/nogoegst/onionize"
-	"github.com/nogoegst/onionutil"
-	"github.com/nogoegst/terminal"
-	"github.com/nogoegst/textqr"
-	"github.com/nogoegst/tlspin"
+	"github.com/unkaktus/fileserver"
+	"github.com/unkaktus/onionize"
+	"github.com/unkaktus/onionutil"
+	"github.com/unkaktus/terminal"
+	"github.com/unkaktus/textqr"
+	"github.com/unkaktus/tlspin/v2"
 )
 
 var debug bool

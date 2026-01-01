@@ -13,11 +13,11 @@ You have to have Go 1.8+ installed to build `onionize`.
 
 CLI-only version:
 ```
-$ go get github.com/nogoegst/onionize/cmd/onionize
+$ go get github.com/unkaktus/onionize/cmd/onionize
 ```
 CLI + GUI version (reqiures GTK3 installed):
 ```
-$ go get -tags gui github.com/nogoegst/onionize/cmd/onionize
+$ go get -tags gui github.com/unkaktus/onionize/cmd/onionize
 ```
 If you have troubles setting up GUI version straight away, try to build it
 using Docker (see /dockerfiles). Also you may look into Dockerfiles themselves
@@ -73,7 +73,7 @@ $ onionize -id-key onion.key /path/to/the-thing
 
 TLS
 ---
-You can specify [tlspin](https://github.com/nogoegst/tlspin) private key
+You can specify [tlspin](https://github.com/unkaktus/tlspin) private key
 via `-tlspin-key` flag.
 
 When running with `-local` flag TLS enabled by default via tlspin with

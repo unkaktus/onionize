@@ -18,10 +18,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/nogoegst/bulb"
-	"github.com/nogoegst/fileserver"
-	"github.com/nogoegst/onionize/util"
-	"github.com/nogoegst/onionutil"
+	"github.com/unkaktus/bulb"
+	"github.com/unkaktus/fileserver"
+	"github.com/unkaktus/onionize/util"
+	"github.com/unkaktus/onionutil"
 )
 
 const slugLength = 16
